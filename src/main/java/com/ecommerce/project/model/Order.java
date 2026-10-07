@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -36,4 +37,8 @@ public class Order {
     @JoinColumn(name = "address_id")
     private Address address;
 
+    private String createdBy;
+    private LocalDateTime createdOn;
+    private String lastUpdatedBy;
+    private LocalDateTime lastUpdatedOn;
 }

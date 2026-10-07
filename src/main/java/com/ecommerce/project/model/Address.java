@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -24,6 +26,11 @@ public class Address {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    private String createdBy;
+    private LocalDateTime createdOn;
+    private String lastUpdatedBy;
+    private LocalDateTime lastUpdatedOn;
 
     public Address(String street, String buildingName, String city, String country, String pincode) {
         this.street = street;

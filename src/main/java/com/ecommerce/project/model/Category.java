@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @Data
@@ -19,4 +21,8 @@ public class Category {
     private Long categoryId;
     private String categoryName;
     private char status;
+    private String createdBy;
+    private LocalDateTime createdOn;
+    private String lastUpdatedBy;
+    private LocalDateTime lastUpdatedOn;
 }

@@ -9,4 +9,5 @@ public class SystemConstants {
     public static final String SORT_DIR = "asc";
     public static final String ASC = "asc";
     public static final String SORT_CATEGORY_BY = "categoryId";
+    public static final String SYSTEM = "SYSTEM";
 }

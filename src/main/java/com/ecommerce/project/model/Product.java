@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,4 +38,9 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             fetch = FetchType.EAGER)
     private List<CartItem> cartItems = new ArrayList<>();
+
+    private String createdBy;
+    private LocalDateTime createdOn;
+    private String lastUpdatedBy;
+    private LocalDateTime lastUpdatedOn;
 }

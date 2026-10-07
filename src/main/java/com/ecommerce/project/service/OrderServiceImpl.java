@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,7 +85,10 @@ public class OrderServiceImpl implements OrderService{
         payment.setOrder(order);
         payment = paymentRepository.save(payment);
         order.setPayment(payment);
-
+        order.setCreatedBy(authUtil.loggedInUser().getUserName());
+        order.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        order.setCreatedOn(LocalDateTime.now());
+        order.setLastUpdatedOn(LocalDateTime.now());
         Order savedOrder = orderRepository.save(order);
         List<OrderItem> orderItems = cartItems.stream().map(cartItem -> {
             OrderItem orderItem = new OrderItem();
@@ -93,6 +97,10 @@ public class OrderServiceImpl implements OrderService{
             orderItem.setDiscount(cartItem.getDiscount());
             orderItem.setProduct(cartItem.getProduct());
             orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setCreatedBy(authUtil.loggedInUser().getUserName());
+            orderItem.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+            orderItem.setCreatedOn(LocalDateTime.now());
+            orderItem.setLastUpdatedOn(LocalDateTime.now());
             return orderItem;
         }).collect(Collectors.toList());
         orderItems = orderItemRepository.saveAll(orderItems);
@@ -102,6 +110,8 @@ public class OrderServiceImpl implements OrderService{
             Product product = cartItem.getProduct();
             Integer quantity = cartItem.getQuantity();
             product.setQuantity(product.getQuantity() - quantity);
+            product.setLastUpdatedBy(SystemConstants.SYSTEM);
+            product.setLastUpdatedOn(LocalDateTime.now());
             productRepository.save(product);
             productIdsToDelete.add(product.getProductId());
         });
@@ -151,6 +161,10 @@ public class OrderServiceImpl implements OrderService{
         payment = paymentRepository.save(payment);
         order.setTotalAmount(cartItem.getProductPrice() * cartItem.getQuantity());
         order.setPayment(payment);
+        order.setCreatedBy(authUtil.loggedInUser().getUserName());
+        order.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        order.setCreatedOn(LocalDateTime.now());
+        order.setLastUpdatedOn(LocalDateTime.now());
         Order savedOrder = orderRepository.save(order);
 
         OrderItem orderItem = new OrderItem();
@@ -159,10 +173,16 @@ public class OrderServiceImpl implements OrderService{
         orderItem.setDiscount(cartItem.getDiscount());
         orderItem.setProduct(cartItem.getProduct());
         orderItem.setQuantity(cartItem.getQuantity());
+        orderItem.setCreatedBy(authUtil.loggedInUser().getUserName());
+        orderItem.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        orderItem.setCreatedOn(LocalDateTime.now());
+        orderItem.setLastUpdatedOn(LocalDateTime.now());
         orderItem = orderItemRepository.save(orderItem);
 
         Product product = cartItem.getProduct();
         product.setQuantity(product.getQuantity() - cartItem.getQuantity());
+        product.setLastUpdatedBy(SystemConstants.SYSTEM);
+        product.setLastUpdatedOn(LocalDateTime.now());
         productRepository.save(product);
         cartService.deleteProductFromCart(cart.getCartId(), productId);
 

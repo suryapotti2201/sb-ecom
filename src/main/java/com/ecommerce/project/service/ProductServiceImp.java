@@ -11,6 +11,7 @@ import com.ecommerce.project.payload.ProductResponse;
 import com.ecommerce.project.repository.CartRepository;
 import com.ecommerce.project.repository.CategoryRepository;
 import com.ecommerce.project.repository.ProductRepository;
+import com.ecommerce.project.util.AuthUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,6 +43,9 @@ public class ProductServiceImp implements ProductService{
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private AuthUtil authUtil;
+
     @Override
     public ProductDTO createProduct(ProductDTO productDto, Long categoryId) {
         Product product = modelMapper.map(productDto, Product.class);
@@ -53,6 +58,10 @@ public class ProductServiceImp implements ProductService{
         product.setSpecialPrice(product.getPrice() - ((product.getDiscount() * 0.01) * product.getPrice()));
         product.setImage("default.png");
         product.setStatus(SystemConstants.ACTIVE);
+        product.setCreatedBy(authUtil.loggedInUser().getUserName());
+        product.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        product.setCreatedOn(LocalDateTime.now());
+        product.setLastUpdatedOn(LocalDateTime.now());
         Product createdProduct = productRepository.save(product);
         return modelMapper.map(createdProduct, ProductDTO.class);
     }
@@ -85,6 +94,8 @@ public class ProductServiceImp implements ProductService{
         if(optionalProduct.isPresent()){
             Product product = optionalProduct.get();
             product.setStatus(SystemConstants.INACTIVE);
+            product.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+            product.setLastUpdatedOn(LocalDateTime.now());
             Product updatedProduct = productRepository.save(product);
             List<Cart> carts = cartRepository.findByProductId(updatedProduct.getProductId());
             carts.forEach(cart -> cartService.deleteProductFromCart(cart.getCartId(), productId));
@@ -105,6 +116,8 @@ public class ProductServiceImp implements ProductService{
         productFromDb.setDiscount(product.getDiscount());
         productFromDb.setSpecialPrice(product.getPrice() - ((product.getDiscount() * 0.01) * product.getPrice()));
         productFromDb.setQuantity(product.getQuantity());
+        productFromDb.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        productFromDb.setLastUpdatedOn(LocalDateTime.now());
         Product updatedProduct = productRepository.save(productFromDb);
 
         List<Cart> carts = cartRepository.findByProductId(updatedProduct.getProductId());

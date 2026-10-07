@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 @Table(name = "cart_items")
@@ -30,4 +32,9 @@ public class CartItem {
     private Integer quantity;
     private double productPrice;
     private double discount;
+
+    private String createdBy;
+    private LocalDateTime createdOn;
+    private String lastUpdatedBy;
+    private LocalDateTime lastUpdatedOn;
 }

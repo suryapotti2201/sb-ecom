@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,10 @@ public class AddressServiceImpl implements AddressService{
         addresses.add(address);
         user.setAddresses(addresses);
         address.setUser(user);
+        address.setCreatedBy(user.getUserName());
+        address.setLastUpdatedBy(user.getUserName());
+        address.setCreatedOn(LocalDateTime.now());
+        address.setLastUpdatedOn(LocalDateTime.now());
         Address savedAddress = addressRepository.save(address);
         return modelMapper.map(savedAddress, AddressDTO.class);
     }
@@ -74,12 +79,15 @@ public class AddressServiceImpl implements AddressService{
         addressFromDataBase.setCountry(addressDTO.getCountry());
         addressFromDataBase.setStreet(addressDTO.getStreet());
         addressFromDataBase.setBuildingName(addressDTO.getBuildingName());
-
+        addressFromDataBase.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        addressFromDataBase.setLastUpdatedOn(LocalDateTime.now());
         Address updatedAddress = addressRepository.save(addressFromDataBase);
 
         User user = addressFromDataBase.getUser();
         user.getAddresses().removeIf(item -> item.getAddressId().equals(addressId));
         user.getAddresses().add(updatedAddress);
+        user.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        user.setLastUpdatedOn(LocalDateTime.now());
         userRepository.save(user);
         return modelMapper.map(updatedAddress, AddressDTO.class);
     }
@@ -90,6 +98,8 @@ public class AddressServiceImpl implements AddressService{
                 () -> new ResourceNotFoundException("Address", "addressId", addressId));
         User user = addressFromDataBase.getUser();
         user.getAddresses().removeIf(item -> item.getAddressId().equals(addressId));
+        user.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        user.setLastUpdatedOn(LocalDateTime.now());
         userRepository.save(user);
         addressRepository.deleteById(addressId);
         return "Deleted the Address Successfully!";
