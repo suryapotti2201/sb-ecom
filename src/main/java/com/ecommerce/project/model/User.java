@@ -3,6 +3,7 @@ package com.ecommerce.project.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -55,9 +56,9 @@ public class User {
     private Cart cart;
 
     private String createdBy;
-    private String createdOn;
+    private LocalDateTime createdOn;
     private String lastUpdatedBy;
-    private String lastUpdatedOn;
+    private LocalDateTime lastUpdatedOn;
 
     public User( String userName,String emailId, String password) {
         this.emailId = emailId;

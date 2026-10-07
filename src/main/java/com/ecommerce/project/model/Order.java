@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -37,7 +38,7 @@ public class Order {
     private Address address;
 
     private String createdBy;
-    private String createdOn;
+    private LocalDateTime createdOn;
     private String lastUpdatedBy;
-    private String lastUpdatedOn;
+    private LocalDateTime lastUpdatedOn;
 }

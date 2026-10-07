@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 @Table(name = "order_items")
@@ -29,7 +31,7 @@ public class OrderItem {
     private double orderedProductPrice;
 
     private String createdBy;
-    private String createdOn;
+    private LocalDateTime createdOn;
     private String lastUpdatedBy;
-    private String lastUpdatedOn;
+    private LocalDateTime lastUpdatedOn;
 }

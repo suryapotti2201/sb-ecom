@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class Product {
     private List<CartItem> cartItems = new ArrayList<>();
 
     private String createdBy;
-    private String createdOn;
+    private LocalDateTime createdOn;
     private String lastUpdatedBy;
-    private String lastUpdatedOn;
+    private LocalDateTime lastUpdatedOn;
 }

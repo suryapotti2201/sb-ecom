@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 @Table(name = "payments")
@@ -26,9 +28,9 @@ public class Payment {
     private String pgName;
 
     private String createdBy;
-    private String createdOn;
+    private LocalDateTime createdOn;
     private String lastUpdatedBy;
-    private String lastUpdatedOn;
+    private LocalDateTime lastUpdatedOn;
 
     public Payment(String paymentType, String pgPaymentId, String pgStatus, String pgResponseMessage, String pgName) {
         this.paymentType = paymentType;
