@@ -9,6 +9,7 @@ import com.ecommerce.project.payload.CategoryDTO;
 import com.ecommerce.project.payload.CategoryResponse;
 import com.ecommerce.project.repository.CategoryRepository;
 import com.ecommerce.project.repository.ProductRepository;
+import com.ecommerce.project.util.AuthUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,6 +38,9 @@ public class CategoryServiceImp implements CategoryService{
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private AuthUtil authUtil;
+
     @Override
     public CategoryDTO createCategory(CategoryDTO categoryDto) {
         Category category = modelMapper.map(categoryDto, Category.class);
@@ -43,6 +48,10 @@ public class CategoryServiceImp implements CategoryService{
             throw new EcommerceException("Category with the name " + category.getCategoryName() + " already exists !!!");
         }
         category.setStatus(SystemConstants.ACTIVE);
+        category.setCreatedBy(authUtil.loggedInUser().getUserName());
+        category.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        category.setCreatedOn(LocalDateTime.now());
+        category.setLastUpdatedOn(LocalDateTime.now());
         Category savedCategory = categoryRepository.save(category);
         return modelMapper.map(savedCategory, CategoryDTO.class);
     }
@@ -74,6 +83,8 @@ public class CategoryServiceImp implements CategoryService{
         Category category = categoryRepository.findByCategoryIdAndStatus(categoryId, SystemConstants.ACTIVE)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
         category.setStatus(SystemConstants.INACTIVE);
+        category.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        category.setLastUpdatedOn(LocalDateTime.now());
         Category updateCategory = categoryRepository.save(category);
         List<Product> products = productRepository.findByCategory(category);
         products.forEach(product -> productService.deleteProduct(product.getProductId()));
@@ -90,6 +101,8 @@ public class CategoryServiceImp implements CategoryService{
             }
             category.setCategoryId(categoryId);
             category.setStatus(SystemConstants.ACTIVE);
+            category.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+            category.setLastUpdatedOn(LocalDateTime.now());
             Category updatedCategory = categoryRepository.save(category);
             return modelMapper.map(updatedCategory, CategoryDTO.class);
         }else {

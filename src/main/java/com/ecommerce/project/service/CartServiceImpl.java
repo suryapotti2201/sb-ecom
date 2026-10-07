@@ -17,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,9 +68,15 @@ public class CartServiceImpl implements CartService{
         newCartItem.setQuantity(quantity);
         newCartItem.setProductPrice(product.getSpecialPrice());
         newCartItem.setDiscount(product.getDiscount());
+        newCartItem.setCreatedBy(authUtil.loggedInUser().getUserName());
+        newCartItem.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        newCartItem.setCreatedOn(LocalDateTime.now());
+        newCartItem.setLastUpdatedOn(LocalDateTime.now());
         cartItemRepository.save(newCartItem);
 
         cart.setTotalPrice( cart.getTotalPrice() + (quantity * product.getSpecialPrice()));
+        cart.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        cart.setLastUpdatedOn(LocalDateTime.now());
         cart = cartRepository.save(cart);
 
         return convertCartToCartDTO(cart);
@@ -110,6 +117,8 @@ public class CartServiceImpl implements CartService{
         userCart.setTotalPrice(userCart.getTotalPrice() -
                 (cartItem.getProductPrice() * cartItem.getQuantity()));
         cartItemRepository.deleteCartItemByProductIdAndCartId(userCart.getCartId(), productId);
+        userCart.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        userCart.setLastUpdatedOn(LocalDateTime.now());
         cartRepository.save(userCart);
         return "Product (" + cartItem.getProduct().getProductName() +") removed from the cart!";
     }
@@ -143,9 +152,13 @@ public class CartServiceImpl implements CartService{
             cartItemRepository.deleteCartItemByProductIdAndCartId(userCart.getCartId(), productId);
         }else {
             cartItem.setQuantity(cartItem.getQuantity() + quantity);
+            cartItem.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+            cartItem.setLastUpdatedOn(LocalDateTime.now());
             cartItemRepository.save(cartItem);
         }
         userCart.setTotalPrice(userCart.getTotalPrice() + (quantity * cartItem.getProductPrice()));
+        userCart.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        userCart.setLastUpdatedOn(LocalDateTime.now());
         Cart updatedCart = cartRepository.save(userCart);
         return convertCartToCartDTO(updatedCart);
     }
@@ -158,6 +171,10 @@ public class CartServiceImpl implements CartService{
         Cart cart = new Cart();
         cart.setTotalPrice(0.0);
         cart.setUser(authUtil.loggedInUser());
+        cart.setCreatedBy(authUtil.loggedInUser().getUserName());
+        cart.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        cart.setCreatedOn(LocalDateTime.now());
+        cart.setLastUpdatedOn(LocalDateTime.now());
         return cartRepository.save(cart);
     }
 
@@ -187,7 +204,11 @@ public class CartServiceImpl implements CartService{
         cart.setTotalPrice(cart.getTotalPrice() - (cartItem.getProductPrice() * cartItem.getQuantity()) +
                 (product.getSpecialPrice() * cartItem.getQuantity()));
         cartItem.setProductPrice(product.getSpecialPrice());
+        cart.setLastUpdatedBy(SystemConstants.SYSTEM);
+        cart.setLastUpdatedOn(LocalDateTime.now());
         cartRepository.save(cart);
+        cartItem.setLastUpdatedBy(SystemConstants.SYSTEM);
+        cartItem.setLastUpdatedOn(LocalDateTime.now());
         cartItemRepository.save(cartItem);
     }
 
@@ -202,6 +223,8 @@ public class CartServiceImpl implements CartService{
         cart.setTotalPrice(cart.getTotalPrice() -
                 (cartItem.getProductPrice() * cartItem.getQuantity()));
         cartItemRepository.deleteCartItemByProductIdAndCartId(cart.getCartId(), productId);
+        cart.setLastUpdatedBy(SystemConstants.SYSTEM);
+        cart.setLastUpdatedOn(LocalDateTime.now());
         cartRepository.save(cart);
     }
 }
