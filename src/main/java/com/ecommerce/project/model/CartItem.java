@@ -30,4 +30,9 @@ public class CartItem {
     private Integer quantity;
     private double productPrice;
     private double discount;
+
+    private String createdBy;
+    private String createdOn;
+    private String lastUpdatedBy;
+    private String lastUpdatedOn;
 }

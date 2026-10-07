@@ -25,6 +25,11 @@ public class Payment {
     private String pgResponseMessage;
     private String pgName;
 
+    private String createdBy;
+    private String createdOn;
+    private String lastUpdatedBy;
+    private String lastUpdatedOn;
+
     public Payment(String paymentType, String pgPaymentId, String pgStatus, String pgResponseMessage, String pgName) {
         this.paymentType = paymentType;
         this.pgPaymentId = pgPaymentId;

@@ -19,4 +19,8 @@ public class Category {
     private Long categoryId;
     private String categoryName;
     private char status;
+    private String createdBy;
+    private String createdOn;
+    private String lastUpdatedBy;
+    private String lastUpdatedOn;
 }

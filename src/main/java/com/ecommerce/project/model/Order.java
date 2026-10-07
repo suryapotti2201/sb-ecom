@@ -36,4 +36,8 @@ public class Order {
     @JoinColumn(name = "address_id")
     private Address address;
 
+    private String createdBy;
+    private String createdOn;
+    private String lastUpdatedBy;
+    private String lastUpdatedOn;
 }

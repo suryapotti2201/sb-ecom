@@ -27,4 +27,9 @@ public class OrderItem {
     private Integer quantity;
     private double discount;
     private double orderedProductPrice;
+
+    private String createdBy;
+    private String createdOn;
+    private String lastUpdatedBy;
+    private String lastUpdatedOn;
 }

@@ -54,6 +54,11 @@ public class User {
             orphanRemoval = true)
     private Cart cart;
 
+    private String createdBy;
+    private String createdOn;
+    private String lastUpdatedBy;
+    private String lastUpdatedOn;
+
     public User( String userName,String emailId, String password) {
         this.emailId = emailId;
         this.password = password;

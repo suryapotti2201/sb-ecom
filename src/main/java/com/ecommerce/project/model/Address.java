@@ -25,6 +25,11 @@ public class Address {
     @JoinColumn(name = "user_id")
     private User user;
 
+    private String createdBy;
+    private String createdOn;
+    private String lastUpdatedBy;
+    private String lastUpdatedOn;
+
     public Address(String street, String buildingName, String city, String country, String pincode) {
         this.street = street;
         this.buildingName = buildingName;
