@@ -84,34 +84,11 @@ public class AuthController {
         User user = new User(signupRequest.getUserName(), signupRequest.getEmailId(),
                 passwordEncoder.encode(signupRequest.getPassword())
         );
-        Set<String> roleString = signupRequest.getRole();
-        Set<Role> roles = new HashSet<>();
-        if(roleString == null){
-            Role role = roleRepository.findByRoleName(AppRole.ROLE_USER).orElseThrow(() ->
-                    new RuntimeException("Error: Role is not found")
-            );
-            roles.add(role);
-        }else{
-            roleString.forEach(role ->{
-                switch (role){
-                    case "admin":
-                        Role adminRole = roleRepository.findByRoleName(AppRole.ROLE_ADMIN).orElseThrow(() ->
-                                new RuntimeException("Error: Role is not found"));
-                        roles.add(adminRole);
-                        break;
-                    case "seller":
-                        Role sellerRole = roleRepository.findByRoleName(AppRole.ROLE_SELLER).orElseThrow(() ->
-                                new RuntimeException("Error: Role is not found"));
-                        roles.add(sellerRole);
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER).orElseThrow(() ->
-                                new RuntimeException("Error: Role is not found"));
-                        roles.add(userRole);
-                }
-            });
-        }
-        user.setRoles(roles);
+        Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
+                .orElseThrow(() ->
+                        new IllegalStateException("ROLE_USER is missing from the database"));
+
+        user.setRoles(new HashSet<>(Set.of(userRole)));
         userRepository.save(user);
         return ResponseEntity.ok().body(new MessageResponse("User registered successfully!"));
     }
