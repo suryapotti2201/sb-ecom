@@ -1,5 +1,6 @@
 package com.ecommerce.project.security;
 
+import com.ecommerce.project.model.AppRole;
 import com.ecommerce.project.security.jwt.AuthEntryPoint;
 import com.ecommerce.project.security.jwt.AuthTokenFilter;
 import com.ecommerce.project.security.service.UserDetailsServiceImpl;
@@ -56,6 +57,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/v3/api-docs/**").permitAll()
                 .requestMatchers("/swagger/**").permitAll()
                 .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/api/admin/**", "/app/admin/**").hasRole(AppRole.ROLE_ADMIN.toString())
                     .anyRequest().authenticated())
             .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authenticationJwtTokenFilter(),
