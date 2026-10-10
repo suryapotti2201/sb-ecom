@@ -11,4 +11,7 @@ import java.util.List;
 public interface AddressRepository extends JpaRepository<Address, Long> {
     @Query("SELECT a FROM Address a WHERE a.user.emailId = ?1")
     List<Address> findByEmail(String email);
+
+    @Query("SELECT a FROM Address a WHERE a.addressId = ?1 and a.user.emailId = ?2")
+    List<Address> findByIdAndEmailId(Long addressId, String emailId);
 }
