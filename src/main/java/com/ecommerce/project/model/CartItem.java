@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -30,8 +31,8 @@ public class CartItem {
     private Product product;
 
     private Integer quantity;
-    private double productPrice;
-    private double discount;
+    private BigDecimal productPrice;
+    private BigDecimal discount;
 
     private String createdBy;
     private LocalDateTime createdOn;

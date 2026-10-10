@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +22,9 @@ public class Product {
     private String productName;
     private String image;
     private String description;
-    private Double price;
-    private Double specialPrice;
-    private Double discount;
+    private BigDecimal price;
+    private BigDecimal specialPrice;
+    private BigDecimal discount;
     private Long quantity;
     private char status;
 
