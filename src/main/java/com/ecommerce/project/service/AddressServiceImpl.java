@@ -56,8 +56,8 @@ public class AddressServiceImpl implements AddressService{
 
     @Override
     public AddressDTO getAddress(Long addressId) {
-        Address address = addressRepository.findById(addressId).orElseThrow(
-                () -> new ResourceNotFoundException("Address", "addressId", addressId));
+        Address address = addressRepository.findByIdAndEmailId(addressId, authUtil.loggedInEmailId())
+                .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
         return modelMapper.map(address, AddressDTO.class);
     }
 
@@ -72,8 +72,8 @@ public class AddressServiceImpl implements AddressService{
 
     @Override
     public AddressDTO updateAddress(Long addressId, AddressDTO addressDTO) {
-        Address addressFromDataBase = addressRepository.findById(addressId).orElseThrow(
-                () -> new ResourceNotFoundException("Address", "addressId", addressId));
+        Address addressFromDataBase = addressRepository.findByIdAndEmailId(addressId, authUtil.loggedInEmailId())
+                .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
         addressFromDataBase.setCity(addressDTO.getCity());
         addressFromDataBase.setPincode(addressDTO.getPincode());
         addressFromDataBase.setCountry(addressDTO.getCountry());
@@ -94,8 +94,8 @@ public class AddressServiceImpl implements AddressService{
 
     @Override
     public String deleteAddress(Long addressId) {
-        Address addressFromDataBase = addressRepository.findById(addressId).orElseThrow(
-                () -> new ResourceNotFoundException("Address", "addressId", addressId));
+        Address addressFromDataBase = addressRepository.findByIdAndEmailId(addressId, authUtil.loggedInEmailId())
+                .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
         User user = addressFromDataBase.getUser();
         user.getAddresses().removeIf(item -> item.getAddressId().equals(addressId));
         user.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
