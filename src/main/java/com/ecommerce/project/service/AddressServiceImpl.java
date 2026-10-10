@@ -101,7 +101,7 @@ public class AddressServiceImpl implements AddressService{
     public String deleteAddress(Long addressId) {
         List<Address> addressFromDataBase = addressRepository.findByIdAndEmailId(addressId, authUtil.loggedInEmailId());
         if(addressFromDataBase.isEmpty()){
-            new ResourceNotFoundException("Address", "addressId", addressId);
+            throw new ResourceNotFoundException("Address", "addressId", addressId);
         }
         User user = addressFromDataBase.get(0).getUser();
         user.getAddresses().removeIf(item -> item.getAddressId().equals(addressId));
