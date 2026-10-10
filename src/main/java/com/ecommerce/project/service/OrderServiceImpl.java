@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -159,7 +160,8 @@ public class OrderServiceImpl implements OrderService{
         CartItem cartItem = cartItemRepository.findByProductIdAndCardId(productId, cart.getCartId())
                 .orElseThrow(() -> new ResourceNotFoundException("CartItem", "productId", productId));
         payment = paymentRepository.save(payment);
-        order.setTotalAmount(cartItem.getProductPrice() * cartItem.getQuantity());
+        order.setTotalAmount(cartItem.getProductPrice().multiply(
+                BigDecimal.valueOf(cartItem.getQuantity())));
         order.setPayment(payment);
         order.setCreatedBy(authUtil.loggedInUser().getUserName());
         order.setLastUpdatedBy(authUtil.loggedInUser().getUserName());

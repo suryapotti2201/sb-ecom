@@ -17,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +75,7 @@ public class CartServiceImpl implements CartService{
         newCartItem.setLastUpdatedOn(LocalDateTime.now());
         cartItemRepository.save(newCartItem);
 
-        cart.setTotalPrice( cart.getTotalPrice() + (quantity * product.getSpecialPrice()));
+        cart.setTotalPrice(product.getSpecialPrice().multiply(BigDecimal.valueOf(quantity)).add( cart.getTotalPrice()));
         cart.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
         cart.setLastUpdatedOn(LocalDateTime.now());
         cart = cartRepository.save(cart);
@@ -114,8 +115,8 @@ public class CartServiceImpl implements CartService{
         CartItem cartItem = cartItemRepository.findByProductIdAndCardId(productId, userCart.getCartId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("CartItem", "productId", productId));
-        userCart.setTotalPrice(userCart.getTotalPrice() -
-                (cartItem.getProductPrice() * cartItem.getQuantity()));
+        userCart.setTotalPrice(userCart.getTotalPrice().subtract(
+                cartItem.getProductPrice().multiply(BigDecimal.valueOf(product.getQuantity()))));
         cartItemRepository.deleteCartItemByProductIdAndCartId(userCart.getCartId(), productId);
         userCart.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
         userCart.setLastUpdatedOn(LocalDateTime.now());
@@ -156,7 +157,8 @@ public class CartServiceImpl implements CartService{
             cartItem.setLastUpdatedOn(LocalDateTime.now());
             cartItemRepository.save(cartItem);
         }
-        userCart.setTotalPrice(userCart.getTotalPrice() + (quantity * cartItem.getProductPrice()));
+        userCart.setTotalPrice(userCart.getTotalPrice().add(
+                cartItem.getProductPrice().multiply(BigDecimal.valueOf(quantity))));
         userCart.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
         userCart.setLastUpdatedOn(LocalDateTime.now());
         Cart updatedCart = cartRepository.save(userCart);
@@ -169,7 +171,7 @@ public class CartServiceImpl implements CartService{
             return userCart;
         }
         Cart cart = new Cart();
-        cart.setTotalPrice(0.0);
+        cart.setTotalPrice(BigDecimal.valueOf(0));
         cart.setUser(authUtil.loggedInUser());
         cart.setCreatedBy(authUtil.loggedInUser().getUserName());
         cart.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
@@ -201,8 +203,9 @@ public class CartServiceImpl implements CartService{
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product", "productId", productId));
 
-        cart.setTotalPrice(cart.getTotalPrice() - (cartItem.getProductPrice() * cartItem.getQuantity()) +
-                (product.getSpecialPrice() * cartItem.getQuantity()));
+        cart.setTotalPrice(cart.getTotalPrice().subtract(
+                cartItem.getProductPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
+                .add(product.getSpecialPrice().multiply(BigDecimal.valueOf(product.getQuantity()))));
         cartItem.setProductPrice(product.getSpecialPrice());
         cart.setLastUpdatedBy(SystemConstants.SYSTEM);
         cart.setLastUpdatedOn(LocalDateTime.now());
@@ -220,8 +223,8 @@ public class CartServiceImpl implements CartService{
         CartItem cartItem = cartItemRepository.findByProductIdAndCardId(productId, cart.getCartId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("CartItem", "productId", productId));
-        cart.setTotalPrice(cart.getTotalPrice() -
-                (cartItem.getProductPrice() * cartItem.getQuantity()));
+        cart.setTotalPrice(cart.getTotalPrice().subtract(
+                cartItem.getProductPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()))));
         cartItemRepository.deleteCartItemByProductIdAndCartId(cart.getCartId(), productId);
         cart.setLastUpdatedBy(SystemConstants.SYSTEM);
         cart.setLastUpdatedOn(LocalDateTime.now());

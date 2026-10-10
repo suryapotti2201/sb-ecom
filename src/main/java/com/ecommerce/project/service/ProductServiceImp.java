@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +56,9 @@ public class ProductServiceImp implements ProductService{
         if(productRepository.existsByProductName(product.getProductName())){
             throw new EcommerceException("Product with the name " + product.getProductName() + " already exists !!!");
         }
-        product.setSpecialPrice(product.getPrice() - ((product.getDiscount() * 0.01) * product.getPrice()));
+        product.setSpecialPrice(product.getPrice().subtract(
+                product.getDiscount().multiply(BigDecimal.valueOf(0.01)).multiply(
+                        product.getPrice())));
         product.setImage("default.png");
         product.setStatus(SystemConstants.ACTIVE);
         product.setCreatedBy(authUtil.loggedInUser().getUserName());
@@ -114,7 +117,9 @@ public class ProductServiceImp implements ProductService{
         productFromDb.setDescription(product.getDescription());
         productFromDb.setPrice(product.getPrice());
         productFromDb.setDiscount(product.getDiscount());
-        productFromDb.setSpecialPrice(product.getPrice() - ((product.getDiscount() * 0.01) * product.getPrice()));
+        productFromDb.setSpecialPrice(product.getPrice().subtract(
+                product.getDiscount().multiply(BigDecimal.valueOf(0.01)).multiply(
+                        product.getPrice())));
         productFromDb.setQuantity(product.getQuantity());
         productFromDb.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
         productFromDb.setLastUpdatedOn(LocalDateTime.now());
