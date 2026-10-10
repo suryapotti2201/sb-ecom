@@ -9,7 +9,7 @@ import com.ecommerce.project.payload.OrderItemDTO;
 import com.ecommerce.project.payload.OrderRequestDTO;
 import com.ecommerce.project.repository.*;
 import com.ecommerce.project.util.AuthUtil;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -128,6 +128,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
+    @Transactional
     public OrderDTO placeOrder(OrderRequestDTO orderRequestDTO, Long productId) {
         String emailId = authUtil.loggedInEmailId();
 

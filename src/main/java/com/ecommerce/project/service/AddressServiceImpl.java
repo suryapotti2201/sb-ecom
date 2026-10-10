@@ -10,6 +10,7 @@ import com.ecommerce.project.util.AuthUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +32,7 @@ public class AddressServiceImpl implements AddressService{
     UserRepository userRepository;
 
     @Override
+    @Transactional
     public AddressDTO addAddress(AddressDTO addressDTO) {
         Address address = modelMapper.map(addressDTO, Address.class);
         User user = authUtil.loggedInUser();
@@ -73,6 +75,7 @@ public class AddressServiceImpl implements AddressService{
     }
 
     @Override
+    @Transactional
     public AddressDTO updateAddress(Long addressId, AddressDTO addressDTO) {
         List<Address> addresses = addressRepository.findByIdAndEmailId(addressId, authUtil.loggedInEmailId());
         if(addresses.isEmpty()){
@@ -98,6 +101,7 @@ public class AddressServiceImpl implements AddressService{
     }
 
     @Override
+    @Transactional
     public String deleteAddress(Long addressId) {
         List<Address> addressFromDataBase = addressRepository.findByIdAndEmailId(addressId, authUtil.loggedInEmailId());
         if(addressFromDataBase.isEmpty()){
