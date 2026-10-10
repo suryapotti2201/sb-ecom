@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -48,6 +49,7 @@ public class ProductServiceImp implements ProductService{
     private AuthUtil authUtil;
 
     @Override
+    @Transactional
     public ProductDTO createProduct(ProductDTO productDto, Long categoryId) {
         Product product = modelMapper.map(productDto, Product.class);
         Category category = categoryRepository.findById(categoryId).orElseThrow(
@@ -92,6 +94,7 @@ public class ProductServiceImp implements ProductService{
     }
 
     @Override
+    @Transactional
     public ProductDTO deleteProduct(Long productId) {
         Optional<Product> optionalProduct = productRepository.findByProductIdAndStatus(productId, SystemConstants.ACTIVE);
         if(optionalProduct.isPresent()){

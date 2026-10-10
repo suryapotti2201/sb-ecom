@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -79,6 +80,7 @@ public class CategoryServiceImp implements CategoryService{
     }
 
     @Override
+    @Transactional
     public CategoryDTO deleteCategory(Long categoryId) {
         Category category = categoryRepository.findByCategoryIdAndStatus(categoryId, SystemConstants.ACTIVE)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));

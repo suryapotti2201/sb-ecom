@@ -12,10 +12,10 @@ import com.ecommerce.project.repository.CartItemRepository;
 import com.ecommerce.project.repository.CartRepository;
 import com.ecommerce.project.repository.ProductRepository;
 import com.ecommerce.project.util.AuthUtil;
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -41,6 +41,7 @@ public class CartServiceImpl implements CartService{
     ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public CartDTO addProductToCart(Long productId, Integer quantity) {
         Cart cart = fetchCart();
         Product product = productRepository.findByProductIdAndStatus(productId, SystemConstants.ACTIVE)
@@ -197,6 +198,7 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
+    @Transactional
     public void updateProductInCarts(Long cartId, Long productId) {
         Cart cart = cartRepository.findById(cartId).orElseThrow( () ->
                 new ResourceNotFoundException("Cart", "cartId", cartId));
