@@ -56,8 +56,10 @@ public class AddressServiceImpl implements AddressService{
 
     @Override
     public AddressDTO getAddress(Long addressId) {
-        Address address = addressRepository.findByIdAndEmailId(addressId, authUtil.loggedInEmailId())
-                .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
+        List<Address> address = addressRepository.findByIdAndEmailId(addressId, authUtil.loggedInEmailId());
+        if(address.isEmpty()){
+            throw new ResourceNotFoundException("Address", "addressId", addressId);
+        }
         return modelMapper.map(address, AddressDTO.class);
     }
 
@@ -72,8 +74,11 @@ public class AddressServiceImpl implements AddressService{
 
     @Override
     public AddressDTO updateAddress(Long addressId, AddressDTO addressDTO) {
-        Address addressFromDataBase = addressRepository.findByIdAndEmailId(addressId, authUtil.loggedInEmailId())
-                .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
+        List<Address> addresses = addressRepository.findByIdAndEmailId(addressId, authUtil.loggedInEmailId());
+        if(addresses.isEmpty()){
+            throw new ResourceNotFoundException("Address", "addressId", addressId);
+        }
+        Address addressFromDataBase = addresses.get(0);
         addressFromDataBase.setCity(addressDTO.getCity());
         addressFromDataBase.setPincode(addressDTO.getPincode());
         addressFromDataBase.setCountry(addressDTO.getCountry());
@@ -94,9 +99,11 @@ public class AddressServiceImpl implements AddressService{
 
     @Override
     public String deleteAddress(Long addressId) {
-        Address addressFromDataBase = addressRepository.findByIdAndEmailId(addressId, authUtil.loggedInEmailId())
-                .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
-        User user = addressFromDataBase.getUser();
+        List<Address> addressFromDataBase = addressRepository.findByIdAndEmailId(addressId, authUtil.loggedInEmailId());
+        if(addressFromDataBase.isEmpty()){
+            new ResourceNotFoundException("Address", "addressId", addressId);
+        }
+        User user = addressFromDataBase.get(0).getUser();
         user.getAddresses().removeIf(item -> item.getAddressId().equals(addressId));
         user.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
         user.setLastUpdatedOn(LocalDateTime.now());
