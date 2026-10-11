@@ -64,7 +64,7 @@ public class CartServiceImpl implements CartService{
                     " less than or equal to the quantity " + product.getQuantity());
         }
 
-        if(quantity >= 1){
+        if(quantity == null || quantity < 1){
             throw new EcommerceException("Only positive quantities can be added to cart");
         }
 
