@@ -112,6 +112,7 @@ public class ProductServiceImp implements ProductService{
     }
 
     @Override
+    @Transactional
     public ProductDTO updateProduct(ProductDTO productDto, Long productId) {
         Product product = modelMapper.map(productDto, Product.class);
         Product productFromDb = productRepository.findByProductIdAndStatus(productId, SystemConstants.ACTIVE)
