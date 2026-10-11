@@ -83,6 +83,19 @@ public class OrderServiceImpl implements OrderService{
         if(cartItems.isEmpty()){
             throw new EcommerceException("Cart is Empty!");
         }
+
+        List<CartItem> itemsByProductId = cartItems.stream()
+                .sorted(java.util.Comparator.comparing(
+                        item -> item.getProduct().getProductId()))
+                .toList();
+
+        for (CartItem cartItem : itemsByProductId) {
+            decreaseStock(
+                    cartItem.getProduct().getProductId(),
+                    cartItem.getQuantity()
+            );
+        }
+
         payment.setOrder(order);
         payment = paymentRepository.save(payment);
         order.setPayment(payment);
@@ -106,18 +119,9 @@ public class OrderServiceImpl implements OrderService{
         }).collect(Collectors.toList());
         orderItems = orderItemRepository.saveAll(orderItems);
 
-        List<Long> productIdsToDelete = new ArrayList<>();
-        cart.getCartItems().forEach(cartItem -> {
-            Product product = cartItem.getProduct();
-            Integer quantity = cartItem.getQuantity();
-            product.setQuantity(product.getQuantity() - quantity);
-            product.setLastUpdatedBy(SystemConstants.SYSTEM);
-            product.setLastUpdatedOn(LocalDateTime.now());
-            productRepository.save(product);
-            productIdsToDelete.add(product.getProductId());
-        });
-        productIdsToDelete.forEach(productId ->
-                        cartService.deleteProductFromCart(cart.getCartId(), productId));
+        List<Long> productIdsToDelete = cartItems.stream().map(item -> item.getProduct().getProductId())
+                .toList();
+        productIdsToDelete.forEach(productId -> cartService.deleteProductFromCart(cart.getCartId(), productId));
 
         OrderDTO orderDTO = modelMapper.map(savedOrder, OrderDTO.class);
         orderDTO.setAddressId(address.getAddressId());
@@ -160,6 +164,7 @@ public class OrderServiceImpl implements OrderService{
 
         CartItem cartItem = cartItemRepository.findByProductIdAndCardId(productId, cart.getCartId())
                 .orElseThrow(() -> new ResourceNotFoundException("CartItem", "productId", productId));
+        decreaseStock(productId, cartItem.getQuantity());
         payment = paymentRepository.save(payment);
         order.setTotalAmount(cartItem.getProductPrice().multiply(
                 BigDecimal.valueOf(cartItem.getQuantity())));
@@ -181,12 +186,6 @@ public class OrderServiceImpl implements OrderService{
         orderItem.setCreatedOn(LocalDateTime.now());
         orderItem.setLastUpdatedOn(LocalDateTime.now());
         orderItem = orderItemRepository.save(orderItem);
-
-        Product product = cartItem.getProduct();
-        product.setQuantity(product.getQuantity() - cartItem.getQuantity());
-        product.setLastUpdatedBy(SystemConstants.SYSTEM);
-        product.setLastUpdatedOn(LocalDateTime.now());
-        productRepository.save(product);
         cartService.deleteProductFromCart(cart.getCartId(), productId);
 
         OrderDTO orderDTO = modelMapper.map(savedOrder, OrderDTO.class);
@@ -196,5 +195,18 @@ public class OrderServiceImpl implements OrderService{
         orderItemDTOS.add(orderItemDTO);
         orderDTO.setOrderItems(orderItemDTOS);
         return orderDTO;
+    }
+
+    private void decreaseStock(Long productId, Integer quantity) {
+        if (quantity == null || quantity < 1) {
+            throw new EcommerceException("Quantity must be at least 1");
+        }
+
+        int updatedRows = productRepository.decreaseStockIfAvailable(productId, quantity.longValue(),
+                SystemConstants.ACTIVE, SystemConstants.SYSTEM, LocalDateTime.now());
+        if (updatedRows != 1) {
+            throw new EcommerceException("Product " + productId + " is unavailable or has insufficient stock"
+            );
+        }
     }
 }
