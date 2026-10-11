@@ -5,6 +5,7 @@ import com.ecommerce.project.service.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class AddressController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AddressDTO>> getAddresses(){
         List<AddressDTO> addressDTOs = addressService.getAddresses();
         return new ResponseEntity<>(addressDTOs, HttpStatus.OK);

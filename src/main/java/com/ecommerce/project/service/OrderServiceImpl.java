@@ -63,7 +63,7 @@ public class OrderServiceImpl implements OrderService{
             throw new ResourceNotFoundException("Cart", "emailId", emailId);
         }
 
-        Address address = addressRepository.findById(orderRequestDTO.getAddressId())
+        Address address = addressRepository.findByIdAndEmailId(orderRequestDTO.getAddressId(), authUtil.loggedInEmailId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Address", "addressId",
                                 orderRequestDTO.getAddressId()));
@@ -146,7 +146,7 @@ public class OrderServiceImpl implements OrderService{
             throw new ResourceNotFoundException("Cart", "emailId", emailId);
         }
 
-        Address address = addressRepository.findById(orderRequestDTO.getAddressId())
+        Address address = addressRepository.findByIdAndEmailId(orderRequestDTO.getAddressId(), authUtil.loggedInEmailId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Address", "addressId",
                                 orderRequestDTO.getAddressId()));

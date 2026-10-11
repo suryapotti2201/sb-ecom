@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class CartController {
     }
 
     @GetMapping("/carts")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CartDTO>> getCarts(){
         List<CartDTO> cartDTOS = cartService.getAllCarts();
         logger.info("cartDTOS : {}", cartDTOS.toString());
