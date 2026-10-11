@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,9 +17,9 @@ public class ProductDTO {
     private String productName;
     private String image;
     @Min(value = 1, message = "Price should be positive")
-    private Double price;
-    private Double discount;
-    private Double specialPrice;
+    private BigDecimal price;
+    private BigDecimal discount;
+    private BigDecimal specialPrice;
     @Min(value = 1, message = "Quantity should be positive")
     private Long quantity;
     private char status;
