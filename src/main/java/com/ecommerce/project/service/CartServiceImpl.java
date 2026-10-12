@@ -121,7 +121,7 @@ public class CartServiceImpl implements CartService{
                 .orElseThrow(() ->
                         new ResourceNotFoundException("CartItem", "productId", productId));
         userCart.setTotalPrice(userCart.getTotalPrice().subtract(
-                cartItem.getProductPrice().multiply(BigDecimal.valueOf(product.getQuantity()))));
+                cartItem.getProductPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()))));
         cartItemRepository.deleteCartItemByProductIdAndCartId(userCart.getCartId(), productId);
         userCart.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
         userCart.setLastUpdatedOn(LocalDateTime.now());
@@ -209,10 +209,11 @@ public class CartServiceImpl implements CartService{
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product", "productId", productId));
 
-        cart.setTotalPrice(cart.getTotalPrice().subtract(
-                cartItem.getProductPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
-                .add(product.getSpecialPrice().multiply(BigDecimal.valueOf(product.getQuantity()))));
-        cartItem.setProductPrice(product.getSpecialPrice());
+        BigDecimal oldPrice = cartItem.getProductPrice();
+        BigDecimal newPrice = product.getSpecialPrice();
+        BigDecimal priceDifference = newPrice.subtract(oldPrice).multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+        cart.setTotalPrice(cart.getTotalPrice().add(priceDifference));
+        cartItem.setProductPrice(newPrice);
         cart.setLastUpdatedBy(SystemConstants.SYSTEM);
         cart.setLastUpdatedOn(LocalDateTime.now());
         cartRepository.save(cart);

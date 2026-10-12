@@ -73,7 +73,13 @@ public class OrderServiceImpl implements OrderService{
         order.setAddress(address);
         order.setEmailId(emailId);
         order.setStatus("Order Accepted");
-        order.setTotalAmount(cart.getTotalPrice());
+        BigDecimal total = cart.getCartItems().stream()
+                .map(item -> item.getProductPrice()
+                        .multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        cart.setTotalPrice(total);
+        order.setTotalAmount(total);
 
         Payment payment = new Payment(orderRequestDTO.getPaymentType(),
                 orderRequestDTO.getPgPaymentId(), orderRequestDTO.getPgStatus(),
