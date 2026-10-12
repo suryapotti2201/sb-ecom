@@ -11,7 +11,15 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "cart_items")
+@Table(
+        name = "cart_items",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_cart_item_cart_product",
+                        columnNames = {"cart_id", "product_id"}
+                )
+        }
+)
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItem {
