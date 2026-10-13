@@ -44,7 +44,7 @@ public class User {
     private List<Address> addresses= new ArrayList<>();
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "user",
+    @OneToMany(mappedBy = "seller",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             orphanRemoval = true)
     private Set<Product> products;
