@@ -57,6 +57,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/swagger/**").permitAll()
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/api/admin/**", "/app/admin/**").hasRole("ADMIN")
+                .requestMatchers("/app/seller/**").hasRole("SELLER")
                     .anyRequest().authenticated())
             .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authenticationJwtTokenFilter(),

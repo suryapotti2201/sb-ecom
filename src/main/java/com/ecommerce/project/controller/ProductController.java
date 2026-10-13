@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +18,8 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @PostMapping("/app/admin/categories/{categoryId}/product")
+    @PreAuthorize("hasRole('ROLE_SELLER')")
+    @PostMapping("/app/seller/categories/{categoryId}/product")
     public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDto, @PathVariable Long categoryId){
         return new ResponseEntity<>(productService.createProduct(productDto, categoryId), HttpStatus.CREATED);
     }
@@ -31,12 +33,14 @@ public class ProductController {
         return new ResponseEntity<>(productService.getAllProducts(pageNumber, pageSize, sortBy, sortOrder), HttpStatus.OK);
     }
 
-    @DeleteMapping("/app/admin/product/{productId}")
+    @PreAuthorize("hasRole('ROLE_SELLER')")
+    @DeleteMapping("/app/seller/product/{productId}")
     public ResponseEntity<ProductDTO> deleteProduct(@PathVariable Long productId){
         return new ResponseEntity<>(productService.deleteProduct(productId), HttpStatus.OK);
     }
 
-    @PutMapping("/app/admin/product/{productId}")
+    @PreAuthorize("hasRole('ROLE_SELLER')")
+    @PutMapping("/app/seller/product/{productId}")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long productId, @Valid @RequestBody ProductDTO productDto){
         return new ResponseEntity<>(productService.updateProduct(productDto, productId), HttpStatus.OK);
     }

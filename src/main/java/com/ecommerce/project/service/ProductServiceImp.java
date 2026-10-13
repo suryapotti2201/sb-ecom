@@ -63,6 +63,7 @@ public class ProductServiceImp implements ProductService{
                         product.getPrice())));
         product.setImage("default.png");
         product.setStatus(SystemConstants.ACTIVE);
+        product.setSeller(authUtil.loggedInUser());
         product.setCreatedBy(authUtil.loggedInUser().getUserName());
         product.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
         product.setCreatedOn(LocalDateTime.now());
@@ -99,6 +100,11 @@ public class ProductServiceImp implements ProductService{
         Optional<Product> optionalProduct = productRepository.findByProductIdAndStatus(productId, SystemConstants.ACTIVE);
         if(optionalProduct.isPresent()){
             Product product = optionalProduct.get();
+            if(!product.getSeller().getUserId().equals(authUtil.loggedInUser().getUserId())){
+                throw new EcommerceException(
+                        "You do not have permission to modify or delete this product."
+                );
+            }
             product.setStatus(SystemConstants.INACTIVE);
             product.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
             product.setLastUpdatedOn(LocalDateTime.now());
@@ -117,6 +123,11 @@ public class ProductServiceImp implements ProductService{
         Product product = modelMapper.map(productDto, Product.class);
         Product productFromDb = productRepository.findByProductIdAndStatus(productId, SystemConstants.ACTIVE)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+        if(!productFromDb.getSeller().getUserId().equals(authUtil.loggedInUser().getUserId())){
+            throw new EcommerceException(
+                    "You do not have permission to modify or delete this product."
+            );
+        }
         productFromDb.setProductName(product.getProductName());
         productFromDb.setDescription(product.getDescription());
         productFromDb.setPrice(product.getPrice());
