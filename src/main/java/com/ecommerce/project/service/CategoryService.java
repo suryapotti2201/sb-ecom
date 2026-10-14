@@ -1,7 +1,7 @@
 package com.ecommerce.project.service;
 
 import com.ecommerce.project.payload.CategoryDTO;
-import com.ecommerce.project.payload.CategoryResponse;
+import com.ecommerce.project.response.CategoryResponse;
 
 public interface CategoryService {
     CategoryDTO createCategory(CategoryDTO categoryDto);

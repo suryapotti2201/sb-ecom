@@ -2,7 +2,7 @@ package com.ecommerce.project.controller;
 
 import com.ecommerce.project.constants.SystemConstants;
 import com.ecommerce.project.payload.ProductDTO;
-import com.ecommerce.project.payload.ProductResponse;
+import com.ecommerce.project.response.ProductResponse;
 import com.ecommerce.project.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.ecommerce.project.service;
 
 import com.ecommerce.project.payload.ProductDTO;
-import com.ecommerce.project.payload.ProductResponse;
+import com.ecommerce.project.response.ProductResponse;
 
 public interface ProductService {
     ProductDTO createProduct(ProductDTO productDto, Long categoryId);

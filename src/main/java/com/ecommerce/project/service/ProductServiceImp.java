@@ -7,7 +7,7 @@ import com.ecommerce.project.model.Cart;
 import com.ecommerce.project.model.Category;
 import com.ecommerce.project.model.Product;
 import com.ecommerce.project.payload.ProductDTO;
-import com.ecommerce.project.payload.ProductResponse;
+import com.ecommerce.project.response.ProductResponse;
 import com.ecommerce.project.repository.CartRepository;
 import com.ecommerce.project.repository.CategoryRepository;
 import com.ecommerce.project.repository.ProductRepository;
