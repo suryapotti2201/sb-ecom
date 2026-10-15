@@ -54,6 +54,9 @@ public class OrderServiceImpl implements OrderService{
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private SellerOrderService sellerOrderService;
+
     @Override
     @Transactional
     public OrderDTO placeOrder(OrderRequestDTO orderRequestDTO) {
@@ -125,6 +128,8 @@ public class OrderServiceImpl implements OrderService{
         }).collect(Collectors.toList());
         orderItems = orderItemRepository.saveAll(orderItems);
 
+        sellerOrderService.createSellerOrdersForCheckout(order, orderItems);
+
         List<Long> productIdsToDelete = cartItems.stream().map(item -> item.getProduct().getProductId())
                 .toList();
         productIdsToDelete.forEach(productId -> cartService.deleteProductFromCart(cart.getCartId(), productId));
@@ -192,6 +197,11 @@ public class OrderServiceImpl implements OrderService{
         orderItem.setCreatedOn(LocalDateTime.now());
         orderItem.setLastUpdatedOn(LocalDateTime.now());
         orderItem = orderItemRepository.save(orderItem);
+
+        List<OrderItem> orderItems = new ArrayList<>();
+        orderItems.add(orderItem);
+        sellerOrderService.createSellerOrdersForCheckout(order, orderItems);
+
         cartService.deleteProductFromCart(cart.getCartId(), productId);
 
         OrderDTO orderDTO = modelMapper.map(savedOrder, OrderDTO.class);

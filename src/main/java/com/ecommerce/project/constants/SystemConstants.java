@@ -10,4 +10,5 @@ public class SystemConstants {
     public static final String ASC = "asc";
     public static final String SORT_CATEGORY_BY = "categoryId";
     public static final String SYSTEM = "SYSTEM";
+    public static final String SORT_SELLER_ORDER_BY = "createdOn";
 }
