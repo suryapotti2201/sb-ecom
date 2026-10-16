@@ -2,6 +2,7 @@ package com.ecommerce.project.controller;
 
 import com.ecommerce.project.payload.CartDTO;
 import com.ecommerce.project.service.CartService;
+import jakarta.validation.constraints.Positive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,9 @@ public class CartController {
     CartService cartService;
 
     @PostMapping("/carts/products/{productId}/quantity/{quantity}")
-    public ResponseEntity<CartDTO> addProductToCart(@PathVariable Long productId,
-                                                    @PathVariable Integer quantity){
+    public ResponseEntity<CartDTO> addProductToCart(
+            @PathVariable @Positive(message = "Product ID must be greater than zero") Long productId,
+            @PathVariable @Positive(message = "Quantity must be at least 1") Integer quantity){
         CartDTO cartDTO = cartService.addProductToCart(productId, quantity);
         return new ResponseEntity<>(cartDTO, HttpStatus.CREATED);
     }
@@ -50,8 +52,9 @@ public class CartController {
     }
 
     @PutMapping("/carts/products/{productId}/quantity/{quantity}")
-    public ResponseEntity<CartDTO> updateCartProduct(@PathVariable Long productId,
-                                                     @PathVariable Integer quantity){
+    public ResponseEntity<CartDTO> updateCartProduct(
+            @PathVariable @Positive(message = "Product ID must be greater than zero") Long productId,
+            @PathVariable @Positive(message = "Quantity must be at least 1") Integer quantity){
         CartDTO cartDTO = cartService.updateCartProduct(productId, quantity);
         return new ResponseEntity<>(cartDTO, HttpStatus.OK);
     }

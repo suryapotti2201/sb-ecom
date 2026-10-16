@@ -5,6 +5,7 @@ import com.ecommerce.project.payload.ProductDTO;
 import com.ecommerce.project.response.ProductResponse;
 import com.ecommerce.project.service.ProductService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,8 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
     @PostMapping("/app/seller/categories/{categoryId}/product")
-    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDto, @PathVariable Long categoryId){
+    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDto,
+            @PathVariable @Positive(message = "Category ID must be greater than zero")   Long categoryId){
         return new ResponseEntity<>(productService.createProduct(productDto, categoryId), HttpStatus.CREATED);
     }
 
@@ -35,18 +37,22 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
     @DeleteMapping("/app/seller/product/{productId}")
-    public ResponseEntity<ProductDTO> deleteProduct(@PathVariable Long productId){
+    public ResponseEntity<ProductDTO> deleteProduct(
+            @PathVariable @Positive(message = "Product ID must be greater than zero") Long productId){
         return new ResponseEntity<>(productService.deleteProduct(productId), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
     @PutMapping("/app/seller/product/{productId}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long productId, @Valid @RequestBody ProductDTO productDto){
+    public ResponseEntity<ProductDTO> updateProduct(
+            @PathVariable @Positive(message = "Product ID must be greater than zero") Long productId,
+            @Valid @RequestBody ProductDTO productDto){
         return new ResponseEntity<>(productService.updateProduct(productDto, productId), HttpStatus.OK);
     }
 
     @GetMapping("/app/public/product/{productId}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long productId){
+    public ResponseEntity<ProductDTO> getProductById(
+            @PathVariable @Positive(message = "Product ID must be greater than zero") Long productId){
         return new ResponseEntity<>(productService.getProductById(productId), HttpStatus.OK);
 
     }
@@ -61,7 +67,8 @@ public class ProductController {
     }
 
     @GetMapping("/app/public/category/{categoryId}/products")
-    public ResponseEntity<ProductResponse> getAllProductsByCategory(@PathVariable Long categoryId,
+    public ResponseEntity<ProductResponse> getAllProductsByCategory(
+            @PathVariable @Positive(message = "Category ID must be greater than zero") Long categoryId,
             @RequestParam(value = "pageNumber", defaultValue = SystemConstants.PAGE_NUMBER) Integer pageNumber,
             @RequestParam(value = "pageSize", defaultValue = SystemConstants.PAGE_SIZE) Integer pageSize,
             @RequestParam(value = "sortBy", defaultValue = SystemConstants.SORT_PRODUCTS_BY) String sortBy,
