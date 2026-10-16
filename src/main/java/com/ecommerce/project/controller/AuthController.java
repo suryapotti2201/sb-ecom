@@ -47,7 +47,7 @@ public class AuthController {
     private RoleRepository roleRepository;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
         Authentication authentication;
         try{
             authentication = authenticationManager.authenticate(
