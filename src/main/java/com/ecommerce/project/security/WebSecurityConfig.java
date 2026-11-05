@@ -3,6 +3,7 @@ package com.ecommerce.project.security;
 import com.ecommerce.project.security.jwt.AuthEntryPoint;
 import com.ecommerce.project.security.jwt.AuthTokenFilter;
 import com.ecommerce.project.security.service.UserDetailsServiceImpl;
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,7 +53,8 @@ public class WebSecurityConfig {
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(requests ->
-                requests.requestMatchers("/api/auth/**").permitAll()
+                requests.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/v3/api-docs/**").permitAll()
                 .requestMatchers("/swagger/**").permitAll()
                 .requestMatchers("/swagger-ui/**").permitAll()
