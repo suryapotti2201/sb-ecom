@@ -80,7 +80,7 @@ public class AuthController {
         }
         if(userRepository.existsByEmailId(signupRequest.getEmailId())){
             return ResponseEntity.badRequest().body(
-                    new MessageResponse("Error: Username is already taken!"));
+                    new MessageResponse("Error: EmailId is already taken!"));
         }
         User user = new User(signupRequest.getUserName(), signupRequest.getEmailId(),
                 passwordEncoder.encode(signupRequest.getPassword())
