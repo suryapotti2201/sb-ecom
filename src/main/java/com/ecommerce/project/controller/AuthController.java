@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -89,6 +90,10 @@ public class AuthController {
                         new IllegalStateException("ROLE_USER is missing from the database"));
 
         user.setRoles(new HashSet<>(Set.of(userRole)));
+        user.setCreatedBy(signupRequest.getUserName());
+        user.setLastUpdatedBy(signupRequest.getUserName());
+        user.setCreatedOn(LocalDateTime.now());
+        user.setLastUpdatedOn(LocalDateTime.now());
         userRepository.save(user);
         return ResponseEntity.ok().body(new MessageResponse("User registered successfully!"));
     }
