@@ -1,5 +1,6 @@
 package com.ecommerce.project.service;
 
+import lombok.extern.slf4j.Slf4j;
 import com.ecommerce.project.constants.SystemConstants;
 import com.ecommerce.project.exception.EcommerceException;
 import com.ecommerce.project.exception.ResourceNotFoundException;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService{
 
     @Autowired
@@ -60,6 +62,7 @@ public class OrderServiceImpl implements OrderService{
     @Override
     @Transactional
     public OrderDTO placeOrder(OrderRequestDTO orderRequestDTO) {
+        log.info("OrderServiceImpl => placeOrder : In");
         String emailId = authUtil.loggedInEmailId();
         Cart cart = cartRepository.findByEmailId(emailId);
         if(cart == null){
@@ -139,12 +142,14 @@ public class OrderServiceImpl implements OrderService{
         List<OrderItemDTO> orderItemDTOS = orderItems.stream().map(orderItem ->
                 modelMapper.map(orderItem, OrderItemDTO.class)).collect(Collectors.toList());
         orderDTO.setOrderItems(orderItemDTOS);
+        log.info("OrderServiceImpl => placeOrder : Out");
         return orderDTO;
     }
 
     @Override
     @Transactional
     public OrderDTO placeOrder(OrderRequestDTO orderRequestDTO, Long productId) {
+        log.info("OrderServiceImpl => placeOrder : In");
         String emailId = authUtil.loggedInEmailId();
 
         productRepository.findByProductIdAndStatus(productId, SystemConstants.ACTIVE)
@@ -210,10 +215,12 @@ public class OrderServiceImpl implements OrderService{
         OrderItemDTO orderItemDTO = modelMapper.map(orderItem, OrderItemDTO.class);
         orderItemDTOS.add(orderItemDTO);
         orderDTO.setOrderItems(orderItemDTOS);
+        log.info("OrderServiceImpl => placeOrder : Out");
         return orderDTO;
     }
 
     private void decreaseStock(Long productId, Integer quantity) {
+        log.info("OrderServiceImpl => decreaseStock : In");
         if (quantity == null || quantity < 1) {
             throw new EcommerceException("Quantity must be at least 1");
         }
@@ -224,5 +231,6 @@ public class OrderServiceImpl implements OrderService{
             throw new EcommerceException("Product " + productId + " is unavailable or has insufficient stock"
             );
         }
+        log.info("OrderServiceImpl => decreaseStock : Out");
     }
 }

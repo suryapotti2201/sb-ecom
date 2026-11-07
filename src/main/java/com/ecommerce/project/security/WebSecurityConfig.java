@@ -1,5 +1,6 @@
 package com.ecommerce.project.security;
 
+import lombok.extern.slf4j.Slf4j;
 import com.ecommerce.project.security.jwt.AuthEntryPoint;
 import com.ecommerce.project.security.jwt.AuthTokenFilter;
 import com.ecommerce.project.security.service.UserDetailsServiceImpl;
@@ -24,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Slf4j
 public class WebSecurityConfig {
 
     @Autowired
@@ -39,14 +41,17 @@ public class WebSecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider(){
+        log.info("WebSecurityConfig => authenticationProvider : In");
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
+        log.info("WebSecurityConfig => authenticationProvider : Out");
         return authenticationProvider;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        log.info("WebSecurityConfig => filterChain : In");
         http.csrf(AbstractHttpConfigurer::disable)
             .exceptionHandling(exception ->
                 exception.authenticationEntryPoint(unauthorizedHandler))
@@ -64,6 +69,7 @@ public class WebSecurityConfig {
             .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authenticationJwtTokenFilter(),
                         UsernamePasswordAuthenticationFilter.class);
+        log.info("WebSecurityConfig => filterChain : Out");
         return http.build();
     }
 

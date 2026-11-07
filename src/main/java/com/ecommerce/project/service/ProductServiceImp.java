@@ -1,5 +1,6 @@
 package com.ecommerce.project.service;
 
+import lombok.extern.slf4j.Slf4j;
 import com.ecommerce.project.constants.SystemConstants;
 import com.ecommerce.project.exception.EcommerceException;
 import com.ecommerce.project.exception.ResourceNotFoundException;
@@ -28,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ProductServiceImp implements ProductService{
 
     @Autowired
@@ -51,6 +53,7 @@ public class ProductServiceImp implements ProductService{
     @Override
     @Transactional
     public ProductDTO createProduct(ProductDTO productDto, Long categoryId) {
+        log.info("ProductServiceImp => createProduct : In");
         Product product = modelMapper.map(productDto, Product.class);
         Category category = categoryRepository.findById(categoryId).orElseThrow(
                 () -> new ResourceNotFoundException("Category", "categoryId", categoryId));
@@ -69,11 +72,13 @@ public class ProductServiceImp implements ProductService{
         product.setCreatedOn(LocalDateTime.now());
         product.setLastUpdatedOn(LocalDateTime.now());
         Product createdProduct = productRepository.save(product);
+        log.info("ProductServiceImp => createProduct : Out");
         return modelMapper.map(createdProduct, ProductDTO.class);
     }
 
     @Override
     public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        log.info("ProductServiceImp => getAllProducts : In");
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase(SystemConstants.ASC)? Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending();
         Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
@@ -91,12 +96,14 @@ public class ProductServiceImp implements ProductService{
         productResponse.setTotalElements(productPage.getTotalElements());
         productResponse.setTotalPages(productPage.getTotalPages());
         productResponse.setLastPage(productPage.isLast());
+        log.info("ProductServiceImp => getAllProducts : Out");
         return productResponse;
     }
 
     @Override
     @Transactional
     public ProductDTO deleteProduct(Long productId) {
+        log.info("ProductServiceImp => deleteProduct : In");
         Optional<Product> optionalProduct = productRepository.findByProductIdAndStatus(productId, SystemConstants.ACTIVE);
         if(optionalProduct.isPresent()){
             Product product = optionalProduct.get();
@@ -111,6 +118,7 @@ public class ProductServiceImp implements ProductService{
             Product updatedProduct = productRepository.save(product);
             List<Cart> carts = cartRepository.findByProductId(updatedProduct.getProductId());
             carts.forEach(cart -> cartService.deleteProductFromCart(cart.getCartId(), productId));
+            log.info("ProductServiceImp => deleteProduct : Out");
             return modelMapper.map(updatedProduct, ProductDTO.class);
         }else {
           throw new ResourceNotFoundException("Product", "productId", productId);
@@ -120,6 +128,7 @@ public class ProductServiceImp implements ProductService{
     @Override
     @Transactional
     public ProductDTO updateProduct(ProductDTO productDto, Long productId) {
+        log.info("ProductServiceImp => updateProduct : In");
         Product product = modelMapper.map(productDto, Product.class);
         Product productFromDb = productRepository.findByProductIdAndStatus(productId, SystemConstants.ACTIVE)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
@@ -142,13 +151,16 @@ public class ProductServiceImp implements ProductService{
 
         List<Cart> carts = cartRepository.findByProductId(updatedProduct.getProductId());
         carts.forEach(cart -> cartService.updateProductInCarts(cart.getCartId(), productId));
+        log.info("ProductServiceImp => updateProduct : Out");
         return modelMapper.map(updatedProduct, ProductDTO.class);
     }
 
     @Override
     public ProductDTO getProductById(Long productId) {
+        log.info("ProductServiceImp => getProductById : In");
         Optional<Product> product = productRepository.findById(productId);
         if(product.isPresent()){
+            log.info("ProductServiceImp => getProductById : Out");
             return  modelMapper.map(product.get(), ProductDTO.class);
         }else {
             throw new ResourceNotFoundException("Product", "productId", productId);
@@ -157,6 +169,7 @@ public class ProductServiceImp implements ProductService{
 
     @Override
     public ProductResponse getAllActiveProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        log.info("ProductServiceImp => getAllActiveProducts : In");
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase(SystemConstants.ASC)? Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending();
         Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
@@ -174,11 +187,13 @@ public class ProductServiceImp implements ProductService{
         productResponse.setTotalElements(productPage.getTotalElements());
         productResponse.setTotalPages(productPage.getTotalPages());
         productResponse.setLastPage(productPage.isLast());
+        log.info("ProductServiceImp => getAllActiveProducts : Out");
         return productResponse;
     }
 
     @Override
     public ProductResponse getAllProductsByCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        log.info("ProductServiceImp => getAllProductsByCategory : In");
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Category", "categoryId", categoryId));
@@ -199,11 +214,13 @@ public class ProductServiceImp implements ProductService{
         productResponse.setTotalElements(productPage.getTotalElements());
         productResponse.setTotalPages(productPage.getTotalPages());
         productResponse.setLastPage(productPage.isLast());
+        log.info("ProductServiceImp => getAllProductsByCategory : Out");
         return productResponse;
     }
 
     @Override
     public ProductResponse searchProductByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        log.info("ProductServiceImp => searchProductByKeyword : In");
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase(SystemConstants.ASC)? Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending();
         Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
@@ -221,6 +238,7 @@ public class ProductServiceImp implements ProductService{
         productResponse.setTotalElements(productPage.getTotalElements());
         productResponse.setTotalPages(productPage.getTotalPages());
         productResponse.setLastPage(productPage.isLast());
+        log.info("ProductServiceImp => searchProductByKeyword : Out");
         return productResponse;
     }
 }

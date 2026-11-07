@@ -20,7 +20,7 @@ import java.util.Date;
 @Component
 public class JwtUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(JwtUtils.class);
 
     @Value("${spring.app.jwtExpirationMs}")
     private Long jwtExpirationMs;
@@ -30,15 +30,20 @@ public class JwtUtils {
 
 
     public String getJwtFromHeader(HttpServletRequest httpServletRequest){
+        log.info("JwtUtils => getJwtFromHeader : In");
         String bearerToken = httpServletRequest.getHeader("Authorization");
         if(bearerToken != null && bearerToken.startsWith("Bearer ")){
+            log.info("JwtUtils => getJwtFromHeader : Out");
             return bearerToken.substring(7);
         }
+        log.info("JwtUtils => getJwtFromHeader : Out");
         return null;
     }
 
     public String generateTokenFromUsername(UserDetails userDetails){
+        log.info("JwtUtils => generateTokenFromUsername : In");
         String username = userDetails.getUsername();
+        log.info("JwtUtils => generateTokenFromUsername : Out");
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
@@ -61,18 +66,21 @@ public class JwtUtils {
     }
 
     public boolean validateJwtToken(String token){
+        log.info("JwtUtils => validateJwtToken : In");
         try {
             Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(token);
+            log.info("JwtUtils => validateJwtToken : Out");
             return true;
         }catch (MalformedJwtException e){
-            logger.error("Invalid Jwt Token: {}", e.getMessage());
+            log.error("Invalid Jwt Token: {}", e.getMessage());
         }catch (ExpiredJwtException e){
-            logger.error("Jwt token is expired: {}", e.getMessage());
+            log.error("Jwt token is expired: {}", e.getMessage());
         }catch (UnsupportedJwtException e){
-            logger.error("Jwt token is unsupported: {}", e.getMessage());
+            log.error("Jwt token is unsupported: {}", e.getMessage());
         }catch (IllegalArgumentException e){
-            logger.error("Jwt clams String is empty: {}", e.getMessage());
+            log.error("Jwt clams String is empty: {}", e.getMessage());
         }
+        log.info("JwtUtils => validateJwtToken : Out");
         return false;
     }
 }

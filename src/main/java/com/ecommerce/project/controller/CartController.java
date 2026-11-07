@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class CartController {
 
-    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
+    private static final Logger log = LoggerFactory.getLogger(CartController.class);
 
     @Autowired
     CartService cartService;
@@ -26,28 +26,36 @@ public class CartController {
     public ResponseEntity<CartDTO> addProductToCart(
             @PathVariable @Positive(message = "Product ID must be greater than zero") Long productId,
             @PathVariable @Positive(message = "Quantity must be at least 1") Integer quantity){
+        log.info("CartController => addProductToCart : In");
         CartDTO cartDTO = cartService.addProductToCart(productId, quantity);
+        log.info("CartController => addProductToCart : Out");
         return new ResponseEntity<>(cartDTO, HttpStatus.CREATED);
     }
 
     @GetMapping("/carts")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CartDTO>> getCarts(){
+        log.info("CartController => getCarts : In");
         List<CartDTO> cartDTOS = cartService.getAllCarts();
-        logger.info("cartDTOS : {}", cartDTOS.toString());
+        log.info("cartDTOS : {}", cartDTOS.toString());
+        log.info("CartController => getCarts : Out");
         return new ResponseEntity<>(cartDTOS, HttpStatus.OK);
     }
 
     @GetMapping("/carts/user/cart")
     public ResponseEntity<CartDTO> getCardById(){
+        log.info("CartController => getCardById : In");
         CartDTO cartDTO = cartService.getCart();
-        logger.info("cartDTO : {}", cartDTO.toString());
+        log.info("cartDTO : {}", cartDTO.toString());
+        log.info("CartController => getCardById : Out");
         return new ResponseEntity<>(cartDTO, HttpStatus.OK);
     }
 
     @DeleteMapping("/carts/product/{productId}")
     public ResponseEntity<String> deleteProductFromCart(@PathVariable Long productId){
+        log.info("CartController => deleteProductFromCart : In");
         String status = cartService.deleteProductFromCart(productId);
+        log.info("CartController => deleteProductFromCart : Out");
         return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
@@ -55,7 +63,9 @@ public class CartController {
     public ResponseEntity<CartDTO> updateCartProduct(
             @PathVariable @Positive(message = "Product ID must be greater than zero") Long productId,
             @PathVariable @Positive(message = "Quantity must be at least 1") Integer quantity){
+        log.info("CartController => updateCartProduct : In");
         CartDTO cartDTO = cartService.updateCartProduct(productId, quantity);
+        log.info("CartController => updateCartProduct : Out");
         return new ResponseEntity<>(cartDTO, HttpStatus.OK);
     }
 
