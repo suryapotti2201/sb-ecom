@@ -20,7 +20,7 @@ import java.io.IOException;
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthTokenFilter.class);
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -31,6 +31,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        log.info("AuthTokenFilter => doFilterInternal : In");
         try {
             String jwtToken = jwtUtils.getJwtFromHeader(request);
             if(jwtToken != null && jwtUtils.validateJwtToken(jwtToken)){
@@ -44,8 +45,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }catch (Exception e){
-            logger.error("Cannot set authentication : {}", e.getMessage());
+            log.error("Cannot set authentication : {}", e.getMessage());
         }
         filterChain.doFilter(request, response);
+        log.info("AuthTokenFilter => doFilterInternal : Out");
     }
 }

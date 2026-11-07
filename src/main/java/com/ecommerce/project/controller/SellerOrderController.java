@@ -1,5 +1,6 @@
 package com.ecommerce.project.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import com.ecommerce.project.constants.SystemConstants;
 import com.ecommerce.project.payload.SellerOrderDTO;
 import com.ecommerce.project.response.SellerOrderResponse;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/app")
+@Slf4j
 public class SellerOrderController {
 
     @Autowired
@@ -24,7 +26,9 @@ public class SellerOrderController {
     public ResponseEntity<SellerOrderDTO> updateOderStatus(
             @PathVariable @Positive(message = "Seller Order ID must be greater than zero") Long sellerOrderId,
             @Valid @RequestBody SellerOrderDTO sellerOrderDTO){
+        log.info("SellerOrderController => updateOderStatus : In");
         SellerOrderDTO updatedSellerOrderDTO = sellerOrderService.updateOrderStatus(sellerOrderDTO, sellerOrderId);
+        log.info("SellerOrderController => updateOderStatus : Out");
         return ResponseEntity.ok(updatedSellerOrderDTO);
     }
 
@@ -35,7 +39,9 @@ public class SellerOrderController {
             @RequestParam(value = "pageSize", defaultValue = SystemConstants.PAGE_SIZE) Integer pageSize,
             @RequestParam(value = "sortBy", defaultValue = SystemConstants.SORT_SELLER_ORDER_BY) String sortBy,
             @RequestParam(value = "sortOrder", defaultValue = SystemConstants.SORT_DIR) String sortOrder) {
+        log.info("SellerOrderController => getSellerOrders : In");
         SellerOrderResponse sellerOrderResponse =  sellerOrderService.getSellerOrders(pageNumber, pageSize, sortBy, sortOrder);
+        log.info("SellerOrderController => getSellerOrders : Out");
         return ResponseEntity.ok(sellerOrderResponse);
     }
 
@@ -48,8 +54,10 @@ public class SellerOrderController {
             @RequestParam(value = "pageSize", defaultValue = SystemConstants.PAGE_SIZE) Integer pageSize,
             @RequestParam(value = "sortBy", defaultValue = SystemConstants.SORT_SELLER_ORDER_BY) String sortBy,
             @RequestParam(value = "sortOrder", defaultValue = SystemConstants.SORT_DIR) String sortOrder) {
+        log.info("SellerOrderController => getSellerOrdersByStatus : In");
         SellerOrderResponse sellerOrderResponse =  sellerOrderService.getSellerOrdersByStatus(status, pageNumber,
                 pageSize, sortBy, sortOrder);
+        log.info("SellerOrderController => getSellerOrdersByStatus : Out");
         return ResponseEntity.ok(sellerOrderResponse);
     }
 }

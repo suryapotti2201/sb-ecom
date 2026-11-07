@@ -1,5 +1,6 @@
 package com.ecommerce.project.service;
 
+import lombok.extern.slf4j.Slf4j;
 import com.ecommerce.project.constants.SystemConstants;
 import com.ecommerce.project.exception.EcommerceException;
 import com.ecommerce.project.exception.ResourceNotFoundException;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class CartServiceImpl implements CartService{
 
     @Autowired
@@ -43,6 +45,7 @@ public class CartServiceImpl implements CartService{
     @Override
     @Transactional
     public CartDTO addProductToCart(Long productId, Integer quantity) {
+        log.info("CartServiceImpl => addProductToCart : In");
         Cart cart = fetchCart();
         Product product = productRepository.findByProductIdAndStatus(productId, SystemConstants.ACTIVE)
                 .orElseThrow(() ->
@@ -85,30 +88,36 @@ public class CartServiceImpl implements CartService{
         cart.setLastUpdatedOn(LocalDateTime.now());
         cart = cartRepository.save(cart);
 
+        log.info("CartServiceImpl => addProductToCart : Out");
         return convertCartToCartDTO(cart);
     }
 
     @Override
     public List<CartDTO> getAllCarts() {
+        log.info("CartServiceImpl => getAllCarts : In");
         List<Cart> carts = cartRepository.findAll();
         if(carts.isEmpty()){
             throw new EcommerceException("No Cart exist");
         }
+        log.info("CartServiceImpl => getAllCarts : Out");
         return carts.stream().map(this::convertCartToCartDTO).toList();
     }
 
     @Override
     public CartDTO getCart() {
+        log.info("CartServiceImpl => getCart : In");
         Cart userCart = cartRepository.findByEmailId(authUtil.loggedInEmailId());
         if(userCart == null){
             throw new EcommerceException("No Cart exist");
         }
+        log.info("CartServiceImpl => getCart : Out");
         return  convertCartToCartDTO(userCart);
     }
 
     @Transactional
     @Override
     public String deleteProductFromCart(Long productId) {
+        log.info("CartServiceImpl => deleteProductFromCart : In");
         Cart userCart = cartRepository.findByEmailId(authUtil.loggedInEmailId());
         if(userCart == null){
             throw new EcommerceException("No Cart exist");
@@ -126,12 +135,14 @@ public class CartServiceImpl implements CartService{
         userCart.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
         userCart.setLastUpdatedOn(LocalDateTime.now());
         cartRepository.save(userCart);
+        log.info("CartServiceImpl => deleteProductFromCart : Out");
         return "Product (" + cartItem.getProduct().getProductName() +") removed from the cart!";
     }
 
     @Transactional
     @Override
     public CartDTO updateCartProduct(Long productId, int quantity) {
+        log.info("CartServiceImpl => updateCartProduct : In");
         if(!(quantity == 1 || quantity == -1)){
             throw new EcommerceException("Provide Valid quantity 1 or -1");
         }
@@ -167,12 +178,15 @@ public class CartServiceImpl implements CartService{
         userCart.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
         userCart.setLastUpdatedOn(LocalDateTime.now());
         Cart updatedCart = cartRepository.save(userCart);
+        log.info("CartServiceImpl => updateCartProduct : Out");
         return convertCartToCartDTO(updatedCart);
     }
 
     private Cart fetchCart() {
+        log.info("CartServiceImpl => fetchCart : In");
         Cart userCart = cartRepository.findByEmailId(authUtil.loggedInEmailId());
         if(userCart != null){
+            log.info("CartServiceImpl => fetchCart : Out");
             return userCart;
         }
         Cart cart = new Cart();
@@ -182,11 +196,13 @@ public class CartServiceImpl implements CartService{
         cart.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
         cart.setCreatedOn(LocalDateTime.now());
         cart.setLastUpdatedOn(LocalDateTime.now());
+        log.info("CartServiceImpl => fetchCart : Out");
         return cartRepository.save(cart);
     }
 
     @Override
     public CartDTO convertCartToCartDTO(Cart cart){
+        log.info("CartServiceImpl => convertCartToCartDTO : In");
         CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
         List<ProductDTO> productList = cart.getCartItems().stream().map(item -> {
             ProductDTO productDTO = modelMapper.map(item.getProduct(), ProductDTO.class);
@@ -194,12 +210,14 @@ public class CartServiceImpl implements CartService{
             return productDTO;
         }).toList();
         cartDTO.setProducts(productList);
+        log.info("CartServiceImpl => convertCartToCartDTO : Out");
         return cartDTO;
     }
 
     @Override
     @Transactional
     public void updateProductInCarts(Long cartId, Long productId) {
+        log.info("CartServiceImpl => updateProductInCarts : In");
         Cart cart = cartRepository.findById(cartId).orElseThrow( () ->
                 new ResourceNotFoundException("Cart", "cartId", cartId));
         Product product = productRepository.findByProductIdAndStatus(productId, SystemConstants.ACTIVE)
@@ -220,11 +238,13 @@ public class CartServiceImpl implements CartService{
         cartItem.setLastUpdatedBy(SystemConstants.SYSTEM);
         cartItem.setLastUpdatedOn(LocalDateTime.now());
         cartItemRepository.save(cartItem);
+        log.info("CartServiceImpl => updateProductInCarts : Out");
     }
 
     @Override
     @Transactional
     public void deleteProductFromCart(Long cartId, Long productId) {
+        log.info("CartServiceImpl => deleteProductFromCart : In");
         Cart cart = cartRepository.findById(cartId).orElseThrow( () ->
                 new ResourceNotFoundException("Cart", "cartId", cartId));
         CartItem cartItem = cartItemRepository.findByProductIdAndCardId(productId, cart.getCartId())
@@ -236,5 +256,6 @@ public class CartServiceImpl implements CartService{
         cart.setLastUpdatedBy(SystemConstants.SYSTEM);
         cart.setLastUpdatedOn(LocalDateTime.now());
         cartRepository.save(cart);
+        log.info("CartServiceImpl => deleteProductFromCart : Out");
     }
 }

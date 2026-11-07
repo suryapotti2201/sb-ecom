@@ -1,5 +1,6 @@
 package com.ecommerce.project.service;
 
+import lombok.extern.slf4j.Slf4j;
 import com.ecommerce.project.exception.EcommerceException;
 import com.ecommerce.project.exception.ResourceNotFoundException;
 import com.ecommerce.project.model.AppRole;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdminUserService {
 
     private final UserRepository userRepository;
@@ -26,6 +28,7 @@ public class AdminUserService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void grantRole(Long userId, String userRole) {
+        log.info("AdminUserService => grantRole : In");
 
         AppRole roleName = switch (userRole) {
             case "ROLE_SELLER" -> AppRole.ROLE_SELLER;
@@ -43,6 +46,7 @@ public class AdminUserService {
                 .anyMatch(existing -> existing.getRoleName() == roleName);
 
         if (alreadyAssigned) {
+            log.info("AdminUserService => grantRole : Out");
             return;
         }
 
@@ -53,5 +57,6 @@ public class AdminUserService {
         user.setLastUpdatedOn(LocalDateTime.now());
 
         userRepository.save(user);
+        log.info("AdminUserService => grantRole : Out");
     }
 }

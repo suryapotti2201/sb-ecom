@@ -1,5 +1,6 @@
 package com.ecommerce.project.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import com.ecommerce.project.model.AppRole;
 import com.ecommerce.project.model.Role;
 import com.ecommerce.project.model.User;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
+@Slf4j
 public class AuthController {
 
     @Autowired
@@ -49,6 +51,7 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
+        log.info("AuthController => authenticateUser : In");
         Authentication authentication;
         try{
             authentication = authenticationManager.authenticate(
@@ -59,6 +62,7 @@ public class AuthController {
             Map<String, Object> map = new HashMap<>();
             map.put("message", "Bad credentials");
             map.put("status", false);
+            log.info("AuthController => authenticateUser : Out");
             return new ResponseEntity<Object>(map, HttpStatus.UNAUTHORIZED);
         }
 
@@ -69,16 +73,20 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority).collect(Collectors.toList());
         UserInfoResponse loginResponse = new UserInfoResponse(userDetails.getId(), jwtToken,
                 userDetails.getUsername(), roles);
+        log.info("AuthController => authenticateUser : Out");
         return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest){
+        log.info("AuthController => registerUser : In");
         if(userRepository.existsByUserName(signupRequest.getUserName())){
+            log.info("AuthController => registerUser : Out");
             return ResponseEntity.badRequest().body(
                     new MessageResponse("Error: Username is already taken!"));
         }
         if(userRepository.existsByEmailId(signupRequest.getEmailId())){
+            log.info("AuthController => registerUser : Out");
             return ResponseEntity.badRequest().body(
                     new MessageResponse("Error: EmailId is already taken!"));
         }
@@ -95,15 +103,18 @@ public class AuthController {
         user.setCreatedOn(LocalDateTime.now());
         user.setLastUpdatedOn(LocalDateTime.now());
         userRepository.save(user);
+        log.info("AuthController => registerUser : Out");
         return ResponseEntity.ok().body(new MessageResponse("User registered successfully!"));
     }
 
     @GetMapping("/username")
     public ResponseEntity<String> currentUserName(Authentication authentication){
+        log.info("AuthController => currentUserName : In");
         String username = "";
         if (authentication != null) {
             username = authentication.getName();
         }
+        log.info("AuthController => currentUserName : Out");
         return new ResponseEntity<>(username, HttpStatus.OK);
     }
 }
