@@ -36,15 +36,10 @@ public class AdminUserService {
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "User not found"
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
 
         Role role = roleRepository.findByRoleName(roleName)
-                .orElseThrow(() -> new IllegalStateException(
-                        "Role is missing from the database: " + roleName
-                ));
+                .orElseThrow( () -> new ResourceNotFoundException("Role", "role", String.valueOf(roleName)));
 
         boolean alreadyAssigned = user.getRoles().stream()
                 .anyMatch(existing -> existing.getRoleName() == roleName);
