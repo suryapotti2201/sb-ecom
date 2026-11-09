@@ -62,13 +62,13 @@ public class CartServiceImpl implements CartService{
             throw new EcommerceException(product.getProductName() + " is not available");
         }
 
+        if(quantity == null || quantity < 1){
+            throw new EcommerceException("Only positive quantities can be added to cart");
+        }
+
         if(product.getQuantity() < quantity){
             throw new EcommerceException("Please make an order of the " + product.getProductName() +
                     " less than or equal to the quantity " + product.getQuantity());
-        }
-
-        if(quantity == null || quantity < 1){
-            throw new EcommerceException("Only positive quantities can be added to cart");
         }
 
         CartItem newCartItem = new CartItem();
