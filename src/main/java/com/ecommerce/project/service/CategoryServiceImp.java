@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -157,5 +158,32 @@ public class CategoryServiceImp implements CategoryService{
         categoryResponse.setLastPage(categoryPage.isLast());
         log.info("CategoryServiceImp => getActiveCategories : Out");
         return categoryResponse;
+    }
+
+    @Override
+    @Transactional
+    public CategoryDTO reactivateCategory(Long categoryId) {
+        log.info("CategoryServiceImp => reactivateCategory : In");
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category", "categoryId", categoryId));
+
+        var status = category.getStatus();
+
+        if (Objects.equals(SystemConstants.INACTIVE, status)) {
+            category.setStatus(SystemConstants.ACTIVE);
+            category.setLastUpdatedOn(LocalDateTime.now());
+            category.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+            category = categoryRepository.save(category);
+        } else if (!Objects.equals(SystemConstants.ACTIVE, status)) {
+            throw new EcommerceException(
+                    "Cannot reactivate category because its stored status is invalid."
+            );
+        }
+
+        CategoryDTO response = modelMapper.map(category, CategoryDTO.class);
+        log.info("CategoryServiceImp => reactivateCategory : Out");
+        return response;
     }
 }
