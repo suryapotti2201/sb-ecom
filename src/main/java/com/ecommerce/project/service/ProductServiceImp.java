@@ -1,5 +1,6 @@
 package com.ecommerce.project.service;
 
+import com.ecommerce.project.util.PaginationUtils;
 import lombok.extern.slf4j.Slf4j;
 import com.ecommerce.project.constants.SystemConstants;
 import com.ecommerce.project.exception.EcommerceException;
@@ -15,10 +16,9 @@ import com.ecommerce.project.repository.ProductRepository;
 import com.ecommerce.project.util.AuthUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +50,9 @@ public class ProductServiceImp implements ProductService{
 
     @Autowired
     private AuthUtil authUtil;
+
+    @Value("${pagination.product.allowed-sort-fields}")
+    private Set<String> allowedSortFields;
 
     @Override
     @Transactional
@@ -79,9 +83,8 @@ public class ProductServiceImp implements ProductService{
     @Override
     public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         log.info("ProductServiceImp => getAllProducts : In");
-        Sort sortByAndOrder = sortOrder.equalsIgnoreCase(SystemConstants.ASC)? Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending();
-        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Pageable pageDetails = PaginationUtils.createPageRequest(pageNumber, pageSize, sortBy,
+                sortOrder, allowedSortFields);
         Page<Product> productPage = productRepository.findAll(pageDetails);
         List<Product> products = productPage.getContent();
         if(products.isEmpty()){
@@ -170,9 +173,8 @@ public class ProductServiceImp implements ProductService{
     @Override
     public ProductResponse getAllActiveProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         log.info("ProductServiceImp => getAllActiveProducts : In");
-        Sort sortByAndOrder = sortOrder.equalsIgnoreCase(SystemConstants.ASC)? Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending();
-        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Pageable pageDetails = PaginationUtils.createPageRequest(pageNumber, pageSize, sortBy,
+                sortOrder, allowedSortFields);
         Page<Product> productPage = productRepository.findAllByStatus(SystemConstants.ACTIVE, pageDetails);
         List<Product> products = productPage.getContent();
         if(products.isEmpty()){
@@ -197,9 +199,8 @@ public class ProductServiceImp implements ProductService{
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Category", "categoryId", categoryId));
-        Sort sortByAndOrder = sortOrder.equalsIgnoreCase(SystemConstants.ASC)? Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending();
-        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Pageable pageDetails = PaginationUtils.createPageRequest(pageNumber, pageSize, sortBy,
+                sortOrder, allowedSortFields);
         Page<Product> productPage = productRepository.findAllByCategory(category, pageDetails);
         List<Product> products = productPage.getContent();
         if(products.isEmpty()){
@@ -221,9 +222,8 @@ public class ProductServiceImp implements ProductService{
     @Override
     public ProductResponse searchProductByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         log.info("ProductServiceImp => searchProductByKeyword : In");
-        Sort sortByAndOrder = sortOrder.equalsIgnoreCase(SystemConstants.ASC)? Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending();
-        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Pageable pageDetails = PaginationUtils.createPageRequest(pageNumber, pageSize, sortBy,
+                sortOrder, allowedSortFields);
         Page<Product> productPage = productRepository.findAllByProductNameLikeIgnoreCase('%' + keyword + '%', pageDetails);
         List<Product> products = productPage.getContent();
         if(products.isEmpty()){

@@ -1,5 +1,6 @@
 package com.ecommerce.project.service;
 
+import com.ecommerce.project.util.PaginationUtils;
 import lombok.extern.slf4j.Slf4j;
 import com.ecommerce.project.constants.SystemConstants;
 import com.ecommerce.project.exception.EcommerceException;
@@ -13,10 +14,9 @@ import com.ecommerce.project.repository.ProductRepository;
 import com.ecommerce.project.util.AuthUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,6 +46,9 @@ public class CategoryServiceImp implements CategoryService{
     @Autowired
     private AuthUtil authUtil;
 
+    @Value("${pagination.category.allowed-sort-fields}")
+    private Set<String> allowedSortFields;
+
     @Override
     public CategoryDTO createCategory(CategoryDTO categoryDto) {
         log.info("CategoryServiceImp => createCategory : In");
@@ -65,9 +69,8 @@ public class CategoryServiceImp implements CategoryService{
     @Override
     public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         log.info("CategoryServiceImp => getAllCategories : In");
-        Sort sortByAndOrder = sortOrder.equalsIgnoreCase(SystemConstants.ASC)? Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending();
-        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Pageable pageDetails = PaginationUtils.createPageRequest(pageNumber, pageSize, sortBy,
+                sortOrder, allowedSortFields);
         Page<Category> categoryPage = categoryRepository.findAll(pageDetails);
         List<Category> categories = categoryPage.getContent();
         if(categories.isEmpty()){
@@ -135,9 +138,8 @@ public class CategoryServiceImp implements CategoryService{
     @Override
     public CategoryResponse getActiveCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         log.info("CategoryServiceImp => getActiveCategories : In");
-        Sort sortByAndOrder = sortOrder.equalsIgnoreCase(SystemConstants.ASC)? Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending();
-        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Pageable pageDetails = PaginationUtils.createPageRequest(pageNumber, pageSize, sortBy,
+                sortOrder, allowedSortFields);
         Page<Category> categoryPage = categoryRepository.findAllByStatus(SystemConstants.ACTIVE, pageDetails);
         List<Category> categories = categoryPage.getContent();
         if(categories.isEmpty()){
