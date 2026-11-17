@@ -1,6 +1,7 @@
 package com.ecommerce.project.service;
 
 
+import com.ecommerce.project.util.PaginationUtils;
 import lombok.extern.slf4j.Slf4j;
 import com.ecommerce.project.constants.SystemConstants;
 import com.ecommerce.project.exception.EcommerceException;
@@ -12,15 +13,15 @@ import com.ecommerce.project.response.SellerOrderResponse;
 import com.ecommerce.project.util.AuthUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @Service
@@ -35,6 +36,9 @@ public class SellerOrderServiceImpl implements SellerOrderService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Value("${pagination.seller-order.allowed-sort-fields}")
+    private Set<String> allowedSortFields;
 
     @Override
     public void createSellerOrdersForCheckout(Order order, List<OrderItem> orderItems) {
@@ -94,9 +98,8 @@ public class SellerOrderServiceImpl implements SellerOrderService {
     @Override
     public SellerOrderResponse getSellerOrders(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         log.info("SellerOrderServiceImpl => getSellerOrders : In");
-        Sort sortByAndOrder = sortOrder.equalsIgnoreCase(SystemConstants.ASC)? Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending();
-        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Pageable pageDetails = PaginationUtils.createPageRequest(pageNumber, pageSize, sortBy,
+                sortOrder, allowedSortFields);
         Page<SellerOrder> sellerOrderPage = sellerOrderRepository.findAllByUserId(authUtil.loggedInUserId(), pageDetails);
         List<SellerOrder> sellerOrders = sellerOrderPage.getContent();
         List<SellerOrderDTO> sellerOrderDTOs = sellerOrders.stream().map(sellerOrder ->
@@ -121,9 +124,8 @@ public class SellerOrderServiceImpl implements SellerOrderService {
         } catch (IllegalArgumentException exception) {
             throw new EcommerceException("Unsupported order status");
         }
-        Sort sortByAndOrder = sortOrder.equalsIgnoreCase(SystemConstants.ASC)? Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending();
-        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Pageable pageDetails = PaginationUtils.createPageRequest(pageNumber, pageSize, sortBy,
+                sortOrder, allowedSortFields);
         Page<SellerOrder> sellerOrderPage = sellerOrderRepository.findAllByUserIdAndStatus(authUtil.loggedInUserId(),
                 orderStatus, pageDetails);
         List<SellerOrder> sellerOrders = sellerOrderPage.getContent();
