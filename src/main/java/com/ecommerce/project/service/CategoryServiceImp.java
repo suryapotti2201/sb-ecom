@@ -105,22 +105,18 @@ public class CategoryServiceImp implements CategoryService{
     @Override
     public CategoryDTO updateCategory(Long categoryId, CategoryDTO categoryDto) {
         log.info("CategoryServiceImp => updateCategory : In");
-        Category category = modelMapper.map(categoryDto, Category.class);
-        Optional<Category> optionalCategory = categoryRepository.findByCategoryIdAndStatus(categoryId, SystemConstants.ACTIVE);
-        if (optionalCategory.isPresent()){
-            if(categoryRepository.existsByCategoryName(category.getCategoryName())){
-                throw new EcommerceException("Category with the name " + category.getCategoryName() + " already exists !!!");
-            }
-            category.setCategoryId(categoryId);
-            category.setStatus(SystemConstants.ACTIVE);
-            category.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
-            category.setLastUpdatedOn(LocalDateTime.now());
-            Category updatedCategory = categoryRepository.save(category);
-            log.info("CategoryServiceImp => updateCategory : Out");
-            return modelMapper.map(updatedCategory, CategoryDTO.class);
-        }else {
-            throw new ResourceNotFoundException("Category", "categoryId", categoryId);
+        Category category = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new ResourceNotFoundException("Category", "categoryId", categoryId)
+        );
+        if(categoryRepository.existsByCategoryNameAndCategoryIdNot(categoryDto.getCategoryName(), categoryId)){
+            throw new EcommerceException("Category with the name " + categoryDto.getCategoryName() + " already exists !!!");
         }
+        category.setCategoryName(categoryDto.getCategoryName());
+        category.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
+        category.setLastUpdatedOn(LocalDateTime.now());
+        Category updatedCategory = categoryRepository.save(category);
+        log.info("CategoryServiceImp => updateCategory : Out");
+        return modelMapper.map(updatedCategory, CategoryDTO.class);
     }
 
     @Override
