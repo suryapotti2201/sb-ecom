@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -65,9 +66,10 @@ public class ProductServiceImp implements ProductService{
         if(productRepository.existsByProductName(product.getProductName())){
             throw new EcommerceException("Product with the name " + product.getProductName() + " already exists !!!");
         }
-        product.setSpecialPrice(product.getPrice().subtract(
+        BigDecimal specialPrice = product.getPrice().subtract(
                 product.getDiscount().multiply(BigDecimal.valueOf(0.01)).multiply(
-                        product.getPrice())));
+                        product.getPrice()));
+        product.setSpecialPrice(specialPrice.setScale(2, RoundingMode.HALF_UP));
         product.setImage("default.png");
         product.setStatus(SystemConstants.ACTIVE);
         product.setSeller(authUtil.loggedInUser());
@@ -144,9 +146,10 @@ public class ProductServiceImp implements ProductService{
         productFromDb.setDescription(product.getDescription());
         productFromDb.setPrice(product.getPrice());
         productFromDb.setDiscount(product.getDiscount());
-        productFromDb.setSpecialPrice(product.getPrice().subtract(
+        BigDecimal specialPrice = product.getPrice().subtract(
                 product.getDiscount().multiply(BigDecimal.valueOf(0.01)).multiply(
-                        product.getPrice())));
+                        product.getPrice()));
+        productFromDb.setSpecialPrice(specialPrice.setScale(2, RoundingMode.HALF_UP));
         productFromDb.setQuantity(product.getQuantity());
         productFromDb.setLastUpdatedBy(authUtil.loggedInUser().getUserName());
         productFromDb.setLastUpdatedOn(LocalDateTime.now());
