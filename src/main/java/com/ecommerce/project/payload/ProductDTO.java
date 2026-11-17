@@ -38,4 +38,8 @@ public class ProductDTO {
     private Long quantity;
 
     private char status;
+
+    @NotBlank(message = "Product description is required.")
+    @Size(max = 255, message = "Product description must not exceed 255 characters.")
+    private String description;
 }
