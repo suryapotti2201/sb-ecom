@@ -9,8 +9,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -65,5 +67,29 @@ public class CustomExceptionHandler {
                 .body(Map.of(
                         "message", "Unable to save data. Please try again later."
                 ));
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<Map<String, String>> handleMethodValidation(
+            HandlerMethodValidationException ex) {
+
+        if (ex.isForReturnValue()) {
+            throw ex;
+        }
+
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        for (var result : ex.getParameterValidationResults()) {
+            String parameterName = result.getMethodParameter().getParameterName();
+
+            for (var error : result.getResolvableErrors()) {
+                String key = error instanceof FieldError fieldError
+                        ? fieldError.getField()
+                        : parameterName;
+                errors.putIfAbsent(key, error.getDefaultMessage());
+            }
+        }
+
+        return ResponseEntity.badRequest().body(errors);
     }
 }
