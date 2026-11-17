@@ -62,4 +62,11 @@ public class CategoryController {
             @RequestParam(value = "sortOrder", defaultValue = SystemConstants.SORT_DIR) String sortOrder){
         return new ResponseEntity<>(categoryService.getActiveCategories(pageNumber, pageSize, sortBy, sortOrder), HttpStatus.OK);
     }
+
+    @PatchMapping("/app/admin/category/{categoryId}/reactivate")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<CategoryDTO> reactivateCategory(
+            @PathVariable @Positive(message = "Category ID must be greater than zero") Long categoryId){
+        return new ResponseEntity<>(categoryService.reactivateCategory(categoryId), HttpStatus.OK);
+    }
 }

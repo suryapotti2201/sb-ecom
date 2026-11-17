@@ -15,4 +15,6 @@ public interface CategoryService {
     CategoryDTO getCategoryById(Long categoryId);
 
     CategoryResponse getActiveCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+
+    CategoryDTO reactivateCategory(Long categoryId);
 }
