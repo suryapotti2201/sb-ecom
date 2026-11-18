@@ -34,8 +34,10 @@ public class ProductDTO {
     private BigDecimal specialPrice;
 
     @NotNull(message = "Stock quantity is required")
-    @PositiveOrZero(message = "Stock quantity must be zero or greater")
-    private Long quantity;
+    @Positive(message = "Stock quantity must be greater than zero")
+    @Digits(integer = 18, fraction = 0,
+            message = "Stock quantity must be a whole number with at most 18 digits")
+    private BigDecimal quantity;
 
     private char status;
 
